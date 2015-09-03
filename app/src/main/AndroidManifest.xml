@@ -18,12 +18,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SavesActivity"
+            android:name=".AlarmMenuActivity"
             android:label="@string/title_activity_saves"
             android:parentActivityName=".MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="jhernandez.gameclock.MainActivity" />
+        </activity>
+        <activity
+            android:name=".CreateAlarmActivity"
+            android:label="@string/title_activity_create_alarm"
+            android:parentActivityName=".AlarmMenuActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="jhernandez.gameclock.AlarmMenuActivity" />
         </activity>
     </application>
 

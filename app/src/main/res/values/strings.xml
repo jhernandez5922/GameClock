@@ -7,7 +7,21 @@
     <string name="app_name">GameClock</string>
     <string name="main_title">Main Menu</string>
     <string name="main_tutorial">Tutorial</string>
-    <string name="main_villages">Villages</string>
-    <string name="title_activity_saves">SavesActivity</string>
+    <string name="main_alarms">Alarms</string>
+    <string name="title_activity_saves">AlarmMenuActivity</string>
     <string name="hello_world">Hello world!</string>
+
+
+    //Saved Alarm Times
+    <string name="alarms_title">Manage Alarms</string>
+    <string name="alarm1">New Alarm</string>
+    <string name="alarm2">New Alarm</string>
+    <string name="alarm3">New Alarm</string>
+    <string name="alarm4">New Alarm</string>
+    <string name="alarm5">New Alarm</string>
+    <string name="title_activity_create_alarm">CreateAlarmActivity</string>
+
+    //Create Alarm
+    <string name="name_alarm_hint">Name your Alarm</string>
+    <string name="create_alarm_button">Create Alarm</string>
 </resources>
