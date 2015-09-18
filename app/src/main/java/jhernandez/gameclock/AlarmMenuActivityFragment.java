@@ -36,7 +36,7 @@ public class AlarmMenuActivityFragment extends Fragment {
         alarm1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(getActivity(), CreateAlarmActivity.class), 1);
+                startActivityForResult(new Intent(getActivity(), AlarmSettings.class), 1);
             }
         });
 

@@ -22,6 +22,17 @@
     <string name="title_activity_create_alarm">CreateAlarmActivity</string>
 
     //Create Alarm
+    <string name="new_alarm_name">Name of Alarm</string>
     <string name="name_alarm_hint">Name your Alarm</string>
-    <string name="create_alarm_button">Create Alarm</string>
+    <string name="alarm_active">Active</string>
+    <string name="toggle_clock">24Hrs</string>
+    <string name="am_pm">AmPm</string>
+
+
+
+
+    //Preference Keys
+    <string name="timePicker">tpKey</string>
+    <string name="time_format_key">timeFormatKey</string>
+    <string name="repeating_alarm">Repeating</string>
 </resources>
