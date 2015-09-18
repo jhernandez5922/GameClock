@@ -98,7 +98,7 @@ public class AlarmMenuActivityFragment extends Fragment {
             }
             ((Button) getActivity().findViewById(id))
                     .setText(name);
-            Toast.makeText(getContext(), "Alarm " + name + "Created", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Alarm " + data.getStringExtra("days") + "Created at: " + data.getStringExtra("time"), Toast.LENGTH_SHORT).show();
         }
     }
 }

@@ -36,8 +36,8 @@ public class TimePreference extends DialogPreference {
     @Override
     protected View onCreateDialogView() {
         picker=new TimePicker(getContext());
-        picker.setHour(lastHour);
-        picker.setMinute(lastMinute);
+        picker.setCurrentHour(lastHour);
+        picker.setCurrentMinute(lastMinute);
         return(picker);
     }
 

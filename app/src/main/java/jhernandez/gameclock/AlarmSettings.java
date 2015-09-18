@@ -2,6 +2,7 @@ package jhernandez.gameclock;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -22,11 +23,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -48,10 +49,12 @@ public class AlarmSettings extends PreferenceActivity {
      * shown on tablets.
      */
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
+    private static Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        intent = new Intent();
     }
 
     @Override
@@ -98,6 +101,7 @@ public class AlarmSettings extends PreferenceActivity {
         PreferenceCategory fakeHeader = new PreferenceCategory(this);
         fakeHeader.setTitle(R.string.pref_header_general);
         addPreferencesFromResource(R.xml.pref_general);
+        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
 
         // Add 'notifications' preferences, and a corresponding header.
         fakeHeader = new PreferenceCategory(this);
@@ -114,8 +118,8 @@ public class AlarmSettings extends PreferenceActivity {
 
 
         findPreference("repeating").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-
-
+        Set<String> t = ((MultiSelectListPreference) findPreference("repeating")).getValues();
+        findPreference("repeating").setSummary(getDays(t.toString()));
 
         //Add save button to footer
         ListView v = getListView();
@@ -126,8 +130,10 @@ public class AlarmSettings extends PreferenceActivity {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "Hi", Toast.LENGTH_SHORT).show();
 
+                //TODO ADD ALARM MANAGER HERE
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
     }
@@ -219,24 +225,9 @@ public class AlarmSettings extends PreferenceActivity {
 
             } else if (preference instanceof MultiSelectListPreference) {
                 //For MultiSelectListPreference, parse days checked and set in summary
-                List<String> selections = new ArrayList<>(Arrays.asList(stringValue.replaceAll("[^A-Za-z]", " ").split(" ")));
-                selections.removeAll(Arrays.asList(""));
-                StringBuilder days = new StringBuilder();
-                if(selections.contains("Sun"))
-                    days.append("Sun ");
-                if(selections.contains("Mon"))
-                    days.append("Mon ");
-                if (selections.contains("Tue"))
-                    days.append("Tues ");
-                if(selections.contains("Wed"))
-                    days.append("Wed ");
-                if (selections.contains("Thu"))
-                    days.append("Thur ");
-                if(selections.contains("Fri"))
-                    days.append("Fri ");
-                if (selections.contains("Sat"))
-                    days.append("Sat ");
-                preference.setSummary(days.toString());
+                String days = getDays(stringValue);
+                preference.setSummary(days);
+                intent.putExtra("days", days);
                 //Toast.makeText(preference.getContext(), (String) selections.toArray()[0], Toast.LENGTH_LONG).show();
 
             } else if (preference instanceof TimePreference) {
@@ -256,14 +247,14 @@ public class AlarmSettings extends PreferenceActivity {
                     } else { //if AM
                         stringValue += " AM";
                     }
-
+                    intent.putExtra("time", stringValue);
                     preference.setSummary(stringValue);
                 }
             }else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
-                Toast.makeText(preference.getContext(), stringValue, Toast.LENGTH_LONG).show();
+//                Toast.makeText(preference.getContext(), stringValue, Toast.LENGTH_LONG).show();
             }
             return true;
         }
@@ -328,4 +319,26 @@ public class AlarmSettings extends PreferenceActivity {
         }
     }
 
+    private static String getDays(String value) {
+        List<String> selections = new ArrayList<>(Arrays.asList(value.replaceAll("[^A-Za-z]", " ").split(" ")));
+        selections.removeAll(Arrays.asList(""));
+        StringBuilder days = new StringBuilder();
+        if(selections.contains("Sun"))
+            days.append("Sun ");
+        if(selections.contains("Mon"))
+            days.append("Mon ");
+        if (selections.contains("Tue"))
+            days.append("Tues ");
+        if(selections.contains("Wed"))
+            days.append("Wed ");
+        if (selections.contains("Thu"))
+            days.append("Thur ");
+        if(selections.contains("Fri"))
+            days.append("Fri ");
+        if (selections.contains("Sat"))
+            days.append("Sat ");
+        if(days.toString().equals(""))
+            days.append("Non-Repeating");
+        return days.toString();
+    }
 }
