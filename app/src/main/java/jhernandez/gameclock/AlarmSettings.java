@@ -21,8 +21,7 @@ import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,11 +49,14 @@ public class AlarmSettings extends PreferenceActivity {
      */
     private static final boolean ALWAYS_SIMPLE_PREFS = false;
     private static Intent intent;
+    private static int idx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         intent = new Intent();
+        idx = getIntent().getIntExtra("requestCode", 0);
+
     }
 
     @Override
@@ -113,21 +115,18 @@ public class AlarmSettings extends PreferenceActivity {
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
         // their values. When their values change, their summaries are updated
         // to reflect the new value, per the Android Design guidelines.
-        bindPreferenceSummaryToValue(findPreference("example_text"));
+        bindPreferenceSummaryToValue(findPreference("name"));
         bindPreferenceSummaryToValue(findPreference("tpKey"));
 
 
         findPreference("repeating").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
         Set<String> t = ((MultiSelectListPreference) findPreference("repeating")).getValues();
-        findPreference("repeating").setSummary(getDays(t.toString()));
+        String days = getDays(t.toString());
+        findPreference("repeating").setSummary(days);
+        intent.putExtra("days"+idx, days);
 
-        //Add save button to footer
-        ListView v = getListView();
-        final Button b = new Button(this);
-        v.addFooterView(b);
-
-        b.setText("Save");
-        b.setOnClickListener(new View.OnClickListener() {
+        setContentView(R.layout.fragment_create_alarm);
+        findViewById(R.id.save_alarm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -227,33 +226,23 @@ public class AlarmSettings extends PreferenceActivity {
                 //For MultiSelectListPreference, parse days checked and set in summary
                 String days = getDays(stringValue);
                 preference.setSummary(days);
-                intent.putExtra("days", days);
+                Toast.makeText(preference.getContext(), "days"+idx, Toast.LENGTH_LONG).show();
+                intent.putExtra("days"+idx, days);
                 //Toast.makeText(preference.getContext(), (String) selections.toArray()[0], Toast.LENGTH_LONG).show();
 
             } else if (preference instanceof TimePreference) {
                 //For TimePreference, changes to 12 Hour or 24 Hour format
                 // than puts time in the preference summary
                 if (stringValue.length() > 1) {
-                    // TODO if 12 hour format is set
-                    String temp = stringValue;
-                    int t = Integer.parseInt(stringValue.substring(0, 2));
-
-                    if (t >= 12) { //if PM
-                        t = t == 12 ? 12 : t - 12;
-                        stringValue = String.valueOf(t) + temp.substring(2) + " PM";
-                    } else if (t == 0) { //if Midnight
-                        t = 12;
-                        stringValue = String.valueOf(t) + temp.substring(2) + " AM";
-                    } else { //if AM
-                        stringValue += " AM";
-                    }
-                    intent.putExtra("time", stringValue);
+                    intent.putExtra("time"+idx,stringValue);
                     preference.setSummary(stringValue);
                 }
             }else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
+                if(preference.getKey().equals("name"))
+                    intent.putExtra("name"+idx, stringValue);
 //                Toast.makeText(preference.getContext(), stringValue, Toast.LENGTH_LONG).show();
             }
             return true;
@@ -296,7 +285,7 @@ public class AlarmSettings extends PreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
+            bindPreferenceSummaryToValue(findPreference("name"));
         }
     }
 
@@ -341,4 +330,5 @@ public class AlarmSettings extends PreferenceActivity {
             days.append("Non-Repeating");
         return days.toString();
     }
+
 }

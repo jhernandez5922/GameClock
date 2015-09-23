@@ -8,7 +8,7 @@
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
     <EditTextPreference
-        android:key="example_text"
+        android:key="name"
         android:title="@string/new_alarm_name"
         android:selectAllOnFocus="true"
         android:inputType="textCapWords"
