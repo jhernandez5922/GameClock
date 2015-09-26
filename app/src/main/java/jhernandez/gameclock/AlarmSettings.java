@@ -1,34 +1,5 @@
 package jhernandez.gameclock;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.MultiSelectListPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
-import android.support.v4.app.NavUtils;
-import android.text.TextUtils;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
-
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
  * handset devices, settings are presented as a single list. On tablets,
@@ -40,14 +11,38 @@ import java.util.Set;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
+
+
+import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Bundle;
+import android.preference.CheckBoxPreference;
+import android.preference.ListPreference;
+import android.preference.MultiSelectListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
+import android.support.v4.app.NavUtils;
+import android.text.TextUtils;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
+
 public class AlarmSettings extends PreferenceActivity {
-    /**
-     * Determines whether to always show the simplified settings UI, where
-     * settings are presented in a single list. When false, settings are shown
-     * as a master/detail two-pane view on tablets. When true, a single pane is
-     * shown on tablets.
-     */
-    private static final boolean ALWAYS_SIMPLE_PREFS = false;
+
+
+    private static final String TAG = AlarmSettings.class.getSimpleName();
     private static Intent intent;
     private static int idx;
 
@@ -90,26 +85,30 @@ public class AlarmSettings extends PreferenceActivity {
      * Shows the simplified settings UI if the device configuration if the
      * device configuration dictates that a simplified, single-pane UI should be
      * shown.
-     */
+    **/
     private void setupSimplePreferencesScreen() {
-        if (!isSimplePreferences(this)) {
-            return;
-        }
         // In the simplified UI, fragments are not used at all and we instead
         // use the older PreferenceActivity APIs.
 
-        // Add 'general' preferences.
+        //dummy variable to grab headers
+        PreferenceCategory headers = new PreferenceCategory(this);
 
-        PreferenceCategory fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_general);
-        addPreferencesFromResource(R.xml.pref_general);
-        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
+        // Add 'general' preferences
+        //set Header for general preferences
+        headers.setTitle(R.string.pref_header_general);
+        //get preferences from XML resource
+        addPreferencesFromResource(R.xml.alarm_pref_general);
+
+        //Set preferences to default values, only for the first time this called
+        PreferenceManager.setDefaultValues(this, R.xml.alarm_pref_general, false);
 
         // Add 'notifications' preferences, and a corresponding header.
-        fakeHeader = new PreferenceCategory(this);
-        fakeHeader.setTitle(R.string.pref_header_notifications);
-        getPreferenceScreen().addPreference(fakeHeader);
-        addPreferencesFromResource(R.xml.pref_notification);
+        //set header for notification preferences
+        headers.setTitle(R.string.pref_header_notifications);
+        getPreferenceScreen().addPreference(headers);
+
+        //get preferences from XML resources
+        addPreferencesFromResource(R.xml.alarm_pref_notification);
 
 
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences to
@@ -117,71 +116,73 @@ public class AlarmSettings extends PreferenceActivity {
         // to reflect the new value, per the Android Design guidelines.
         bindPreferenceSummaryToValue(findPreference("name"));
         bindPreferenceSummaryToValue(findPreference("tpKey"));
-
-
         findPreference("repeating").setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-        Set<String> t = ((MultiSelectListPreference) findPreference("repeating")).getValues();
-        String days = getDays(t.toString());
+
+        //get Values from select list
+        Set<String> daysOfWeek = ((MultiSelectListPreference) findPreference("repeating")).getValues();
+
+        //format values to set summary
+        String days = getDays(daysOfWeek.toString());
+
+        //set summary to preference with days of week
         findPreference("repeating").setSummary(days);
+
+        //add value to activity above
         intent.putExtra("days"+idx, days);
 
-        setContentView(R.layout.fragment_create_alarm);
+        //Set view to show Save button
+        setContentView(R.layout.alarm_pref_footer);
+
+        // Add onClick listener to SAVE footer button to allow
+        // the settings to be saved and sent to the activity above
+        // to set the alarm
         findViewById(R.id.save_alarm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                //TODO ADD ALARM MANAGER HERE
+                //get checkbox state
+                boolean checked = ((CheckBoxPreference) findPreference("active")).isChecked();
+
+                //Add in whether the or not the alarm is active
+                //TODO Replace with delete and move active to above screen
+                intent.putExtra("active"+idx, checked);
+
+                //Format the time from the timePicker and
+                String am_pm;
+                TimePicker timePicker = (TimePicker) findViewById(R.id.timePicker);
+                int hour = timePicker.getCurrentHour(); //get set time
+                int minute = timePicker.getCurrentMinute();
+                if (true) { //TODO ADD 12 HOUR FORMAT
+                    if (hour >= 12) { //if PM
+                        hour = hour == 12 ? 12 : hour - 12;
+                        am_pm = " PM";
+                    } else { //if AM
+                        hour = hour == 0 ? 12 : hour;
+                        am_pm = " AM";
+                    }
+                }
+                else {} //TODO ADD 24 HOUR FORMAT
+
+                //Format for string to be sent to alarm manager
+                String time = String.valueOf(hour) + ":"
+                        + String.format("%02d", minute)
+                        + am_pm;
+                //Add to Extras to be sent back
+                intent.putExtra("time"+idx, time);
+
+                //Let menu activity know results from intent are okay
                 setResult(RESULT_OK, intent);
+
+                //Finish activity and go back
                 finish();
             }
         });
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean onIsMultiPane() {
-        return isXLargeTablet(this) && !isSimplePreferences(this);
-    }
-
-    /**
-     * Helper method to determine if the device has an extra-large screen. For
-     * example, 10" tablets are extra-large.
-     */
-    private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
-
-    /**
-     * Determines whether the simplified settings UI should be shown. This is
-     * true if this is forced via {@link #ALWAYS_SIMPLE_PREFS}, or the device
-     * doesn't have newer APIs like {@link PreferenceFragment}, or the device
-     * doesn't have an extra-large screen. In these cases, a single-pane
-     * "simplified" settings UI should be shown.
-     */
-    private static boolean isSimplePreferences(Context context) {
-        return ALWAYS_SIMPLE_PREFS
-                || Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB
-                || !isXLargeTablet(context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void onBuildHeaders(List<Header> target) {
-        if (!isSimplePreferences(this)) {
-            loadHeadersFromResource(R.xml.pref_headers, target);
-        }
-    }
-
-    /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
-     */
+    **/
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
@@ -226,17 +227,18 @@ public class AlarmSettings extends PreferenceActivity {
                 //For MultiSelectListPreference, parse days checked and set in summary
                 String days = getDays(stringValue);
                 preference.setSummary(days);
-                Toast.makeText(preference.getContext(), "days"+idx, Toast.LENGTH_LONG).show();
+                Toast.makeText(preference.getContext(), "days" + idx, Toast.LENGTH_LONG).show();
                 intent.putExtra("days"+idx, days);
                 //Toast.makeText(preference.getContext(), (String) selections.toArray()[0], Toast.LENGTH_LONG).show();
 
-            } else if (preference instanceof TimePreference) {
-                //For TimePreference, changes to 12 Hour or 24 Hour format
-                // than puts time in the preference summary
-                if (stringValue.length() > 1) {
-                    intent.putExtra("time"+idx,stringValue);
-                    preference.setSummary(stringValue);
-                }
+//            } else if (preference instanceof TimePreference) {
+//                //For TimePreference, changes to 12 Hour or 24 Hour format
+//                // than puts time in the preference summary
+//                if (stringValue.length() > 1) {
+//                    Log.d(TAG, "INDEX VALUE: " +String.valueOf(idx));
+//                    intent.putExtra("time" + idx, stringValue);
+//                    preference.setSummary(stringValue);
+//                }
             }else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
@@ -248,7 +250,6 @@ public class AlarmSettings extends PreferenceActivity {
             return true;
         }
     };
-
     /**
      * Binds a preference's summary to its value. More specifically, when the
      * preference's value is changed, its summary (line of text below the
@@ -257,7 +258,7 @@ public class AlarmSettings extends PreferenceActivity {
      * dependent on the type of preference.
      *
      * @see #sBindPreferenceSummaryToValueListener
-     */
+    **/
     private static void bindPreferenceSummaryToValue(Preference preference) {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
@@ -268,44 +269,6 @@ public class AlarmSettings extends PreferenceActivity {
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
-    }
-
-    /**
-     * This fragment shows general preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_general);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("name"));
-        }
-    }
-
-    /**
-     * This fragment shows notification preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class NotificationPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_notification);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-        }
     }
 
     private static String getDays(String value) {

@@ -32,7 +32,8 @@
 
 
     //Preference Keys
-    <string name="timePicker">tpKey</string>
+    <string name="time_picker">tpKey</string>
     <string name="time_format_key">timeFormatKey</string>
     <string name="repeating_alarm">Repeating</string>
+    <string name="title_activity_test">TestActivity</string>
 </resources>

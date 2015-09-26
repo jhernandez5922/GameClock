@@ -11,7 +11,7 @@ public class CreateAlarmActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_create_alarm);
+        setContentView(R.layout.timepicker_layout);
     }
 
 

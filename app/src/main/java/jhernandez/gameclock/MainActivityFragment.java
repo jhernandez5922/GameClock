@@ -30,7 +30,7 @@ public class MainActivityFragment extends Fragment {
             quit     ->
         */
         //Button to Alarms Menu
-        View inputFragmentView = inflater.inflate(R.layout.fragment_main, container, false);
+        View inputFragmentView = inflater.inflate(R.layout.fragment_main_menu, container, false);
         final Button alarms = (Button) inputFragmentView.findViewById(R.id.main_villages);
         alarms.setOnClickListener(new View.OnClickListener() {
             @Override

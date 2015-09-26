@@ -37,8 +37,7 @@
         </activity>
 
         <receiver
-            android:name=".AlarmReceiver"
-            android:enabled="false" >
+            android:name=".AlarmReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>

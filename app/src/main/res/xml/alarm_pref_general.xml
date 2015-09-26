@@ -1,7 +1,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+
+
+    <jhernandez.gameclock.TimePreference
+        android:name="Pick a Time"
+        android:key="@string/time_picker" />
+
         <CheckBoxPreference
-        android:key="example_checkbox"
+        android:key="active"
         android:title="@string/alarm_active"
         android:defaultValue="true" />
 
@@ -17,11 +23,7 @@
         android:singleLine="true"
         android:maxLines="1" />
 
-    <jhernandez.gameclock.TimePreference
-        android:name="Pick a Time"
-        android:summary=""
-        android:title="Pick a Time"
-        android:key="@string/timePicker" />
+
 
     <MultiSelectListPreference
         android:name="Repeating"
