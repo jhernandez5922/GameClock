@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import jhernandez.gameclock.game.TestActivity;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -36,6 +38,15 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), AlarmMenuActivity.class));
+            }
+        });
+
+        //Button to Launch game --DEBUG ONLY
+        final Button settings = (Button) inputFragmentView.findViewById(R.id.main_settings);
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), TestActivity.class));
             }
         });
 

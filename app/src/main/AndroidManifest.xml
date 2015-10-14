@@ -36,8 +36,7 @@
                 android:value="jhernandez.gameclock.AlarmMenuActivity" />
         </activity>
 
-        <receiver
-            android:name=".AlarmReceiver" >
+        <receiver android:name=".AlarmReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -50,6 +49,11 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="jhernandez.gameclock.AlarmMenuActivity" />
+        </activity>
+        <activity
+            android:name=".game.TestActivity"
+            android:label="@string/title_activity_test"
+            android:screenOrientation="landscape">
         </activity>
     </application>
 

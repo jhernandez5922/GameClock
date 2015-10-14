@@ -14,6 +14,7 @@ package jhernandez.gameclock;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -169,7 +170,8 @@ public class AlarmSettings extends PreferenceActivity {
                         + am_pm;
                 //Add to Extras to be sent back
                 intent.putExtra("time"+idx, time);
-
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                prefs.edit().putInt("lastHour", timePicker.getCurrentHour()).putInt("lastMinute", timePicker.getCurrentMinute()).apply();
                 //Let menu activity know results from intent are okay
                 setResult(RESULT_OK, intent);
 

@@ -73,9 +73,11 @@ public class AlarmMenuActivityFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == FragmentActivity.RESULT_OK) {
             int id = getID(requestCode);
-            Log.v(TAG, "CURRENT: " + data.getStringExtra("time"+requestCode) + "    PlusONE: " + data.getStringExtra("time"+requestCode+1) + "    " + requestCode);
+            //Log.v(TAG, "CURRENT: " + data.getStringExtra("time"+requestCode));
+
+            //Parse name from extras from activity executed
             String name = data.getStringExtra("name"+requestCode) + " at " + data.getStringExtra("time"+requestCode);
-            names[requestCode] = name;
+
             //Set Button Name
             Log.v(TAG, String.valueOf(requestCode));
             ((Button) getActivity().findViewById(id))
@@ -142,6 +144,10 @@ public class AlarmMenuActivityFragment extends Fragment {
             alarm.set(Calendar.HOUR_OF_DAY, Integer.valueOf(split[0]));
             alarm.set(Calendar.MINUTE, Integer.valueOf(split[1]));
             alarm.set(Calendar.SECOND, 0);
+            if (alarm.before(System.currentTimeMillis())) {
+                //TODO ADD FUNCTIONALITY TO NEXT ALARM TRIGGER
+                //TODO BASED ON NEXT DAY TO TRIGGER
+            }
             //Set alarm for alarm manager
 
 

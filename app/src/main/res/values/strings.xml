@@ -36,4 +36,8 @@
     <string name="time_format_key">timeFormatKey</string>
     <string name="repeating_alarm">Repeating</string>
     <string name="title_activity_test">TestActivity</string>
+
+    <string name="title_activity_game_screen">GameScreen</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
