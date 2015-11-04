@@ -53,7 +53,16 @@
         <activity
             android:name=".game.TestActivity"
             android:label="@string/title_activity_test"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
+            android:name=".AlarmList"
+            android:label="@string/title_activity_alarm_list" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

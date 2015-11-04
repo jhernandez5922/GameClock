@@ -118,16 +118,16 @@ public class AlarmMenuActivityFragment extends Fragment {
             This function sends the request to the AlarmManager to activate
             the alarm at the given time.
          */
-
         if(extras.getBoolean("active"+idx)) {
-
             /*
                 Formats the time send from settings screen to be read by
                 alarm manager
              */
 
             String time = "12:00 PM"; //dummy time
-
+            boolean [] week = extras.getBooleanArray("days"+idx);
+            if (week == null)
+                week = new boolean[7];
             if (extras.containsKey("time" + idx))  //time was set for alarm and
                 time = extras.getString("time" + idx); //pull data from bundle
 
@@ -144,25 +144,18 @@ public class AlarmMenuActivityFragment extends Fragment {
             alarm.set(Calendar.HOUR_OF_DAY, Integer.valueOf(split[0]));
             alarm.set(Calendar.MINUTE, Integer.valueOf(split[1]));
             alarm.set(Calendar.SECOND, 0);
-            if (alarm.before(System.currentTimeMillis())) {
-                //TODO ADD FUNCTIONALITY TO NEXT ALARM TRIGGER
-                //TODO BASED ON NEXT DAY TO TRIGGER
-            }
-            //Set alarm for alarm manager
-
-
+            AlarmReceiver.getNearestDay(alarm, week);
             //Set up alarm manager
             AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(context, AlarmReceiver.class);
-            PendingIntent alarmIntent = PendingIntent.getBroadcast(context, idx, intent, 0);
-            int currentAPIversion = Build.VERSION.SDK_INT;
-
-            if (currentAPIversion >= Build.VERSION_CODES.KITKAT)
+            PendingIntent alarmIntent = PendingIntent.getBroadcast(context, idx, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            int currentApiVersion = Build.VERSION.SDK_INT;
+            Log.v("GameClock Alarm Setting", "ALARM SET FOR: " + alarm.get(Calendar.DAY_OF_WEEK));
+            if (currentApiVersion >= Build.VERSION_CODES.KITKAT)
                 alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarm.getTimeInMillis(), alarmIntent);
             else
                 alarmMgr.set(AlarmManager.RTC_WAKEUP, alarm.getTimeInMillis(), alarmIntent);
-
-            //Tell receiver to wake up device when alarm triggers
+        //Tell receiver to wake up device when alarm triggers
             ComponentName receiver = new ComponentName(context, AlarmReceiver.class);
             PackageManager pm = context.getPackageManager();
             pm.setComponentEnabledSetting(receiver,
@@ -175,4 +168,6 @@ public class AlarmMenuActivityFragment extends Fragment {
 //            Toast.makeText(context, extras.getString("name") + " at " + extras.getString("time") + " canceled.",Toast.LENGTH_SHORT ).show();
 //        }
     }
+
+
 }

@@ -34,9 +34,12 @@ import android.view.View;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 
@@ -129,7 +132,7 @@ public class AlarmSettings extends PreferenceActivity {
         findPreference("repeating").setSummary(days);
 
         //add value to activity above
-        intent.putExtra("days"+idx, days);
+        //intent.putExtra("days"+idx, days);
 
         //Set view to show Save button
         setContentView(R.layout.alarm_pref_footer);
@@ -230,7 +233,7 @@ public class AlarmSettings extends PreferenceActivity {
                 String days = getDays(stringValue);
                 preference.setSummary(days);
                 Toast.makeText(preference.getContext(), "days" + idx, Toast.LENGTH_LONG).show();
-                intent.putExtra("days"+idx, days);
+                //intent.putExtra("days"+idx, days);
                 //Toast.makeText(preference.getContext(), (String) selections.toArray()[0], Toast.LENGTH_LONG).show();
 
 //            } else if (preference instanceof TimePreference) {
@@ -277,22 +280,49 @@ public class AlarmSettings extends PreferenceActivity {
         List<String> selections = new ArrayList<>(Arrays.asList(value.replaceAll("[^A-Za-z]", " ").split(" ")));
         selections.removeAll(Arrays.asList(""));
         StringBuilder days = new StringBuilder();
-        if(selections.contains("Sun"))
+        boolean [] week = new boolean[7];
+        if(selections.contains("Sun")) {
             days.append("Sun ");
-        if(selections.contains("Mon"))
+            week[0] = true;
+        }
+        if(selections.contains("Mon")) {
             days.append("Mon ");
-        if (selections.contains("Tue"))
+            week[1] = true;
+        }
+        if (selections.contains("Tue")) {
             days.append("Tues ");
-        if(selections.contains("Wed"))
+            week[2] = true;
+        }
+        if(selections.contains("Wed")) {
             days.append("Wed ");
-        if (selections.contains("Thu"))
+            week[3] = true;
+        }
+        if (selections.contains("Thu")) {
             days.append("Thur ");
-        if(selections.contains("Fri"))
+            week[4] = true;
+        }
+        if(selections.contains("Fri")) {
             days.append("Fri ");
-        if (selections.contains("Sat"))
+            week[5] = true;
+        }
+        if (selections.contains("Sat")) {
             days.append("Sat ");
+            week[6] = true;
+        }
         if(days.toString().equals(""))
-            days.append("Non-Repeating");
+            return "Non-Repeating";
+        intent.putExtra("days"+idx, week);
+        Queue<Integer> next = new LinkedList<>();
+        int hours = 24;
+        for (int i = 0; i < 7; i++) {
+            if (!week[i]){
+                hours+=24;
+                continue;
+            }
+            next.add(hours);
+            hours = 24;
+        }
+        intent.putExtra("nextDay"+idx,(Serializable) next);
         return days.toString();
     }
 

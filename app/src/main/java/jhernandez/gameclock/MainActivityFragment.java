@@ -40,7 +40,13 @@ public class MainActivityFragment extends Fragment {
                 startActivity(new Intent(getActivity(), AlarmMenuActivity.class));
             }
         });
-
+        final Button tutorial = (Button) inputFragmentView.findViewById(R.id.main_tutorial);
+        tutorial.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), AlarmList.class));
+            }
+        });
         //Button to Launch game --DEBUG ONLY
         final Button settings = (Button) inputFragmentView.findViewById(R.id.main_settings);
         settings.setOnClickListener(new View.OnClickListener() {
