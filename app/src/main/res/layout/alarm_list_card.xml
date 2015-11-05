@@ -19,7 +19,6 @@
             android:layout_height="wrap_content"
             android:text="Title"
             android:gravity="center_vertical"
-            android:textColor="@android:color/white"
             android:textSize="30dp"/>
 
         <TextView

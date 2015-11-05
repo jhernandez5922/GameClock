@@ -24,7 +24,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         public ViewHolder(View v) {
             super(v);
             titleText = (TextView) v.findViewById(R.id.card_title);
-            description = (TextView) v.findViewById(R.id.card_message);
+            //description = (TextView) v.findViewById(R.id.card_message);
             card = (CardView) v;
         }
     }
@@ -52,7 +52,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.titleText.setText("Alarm");
-        holder.description.setText(mDataset[position]);
+        //holder.description.setText(mDataset[position]);
 
     }
 
