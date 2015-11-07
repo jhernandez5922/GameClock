@@ -1,4 +1,8 @@
 <resources>
+
+    //Content Authority
+    <string name="content_authority">jhernandez.gameclock.sqlite.provider</string>
+
     //Settings Menu Strings
     <string name="action_settings">Settings</string>
     <string name="action_quit">Quit</string>
