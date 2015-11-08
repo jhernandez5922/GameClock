@@ -54,6 +54,8 @@ public class AlarmReceiver extends BroadcastReceiver {
         int day = alarm.get(Calendar.DAY_OF_WEEK);
         if (currentTime.after(alarm))
             day++;
+        if (day > Calendar.SUNDAY)
+            day = 1;
         for (int i = 0; i < 7; i++) {
             if (week[day - 1]) {
                 if(day == alarm.get(Calendar.DAY_OF_WEEK) && i + 1 == 7)

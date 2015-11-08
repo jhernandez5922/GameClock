@@ -43,6 +43,6 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-            //IF NEW COLUMNS NEED IMPLEMENT HERE
+        db.execSQL("DROP TABLE IF EXISTS " + AlarmEntry.TABLE_NAME);
     }
 }

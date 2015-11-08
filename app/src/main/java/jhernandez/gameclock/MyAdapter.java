@@ -1,6 +1,8 @@
 package jhernandez.gameclock;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.widget.CardView;
@@ -28,20 +30,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         // each data item is just a string in this case
         protected TextView titleText;
         protected CardView card;
-        public ViewHolder(View v) {
+
+        public ViewHolder(View v, final Cursor cursor) {
             super(v);
             titleText = (TextView) v.findViewById(R.id.card_title);
             card = (CardView) v;
-            card.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent editAlarm = new Intent(v.getContext(), AlarmSettings.class);
-                    v.getContext().startActivity(editAlarm);
-                }
-            });
         }
     }
-    //TODO CURSOR DOES NOT WORK, RETURNING -1 ON BINDVIEW.
     // Provide a suitable constructor (depends on the kind of dataset)
     public MyAdapter(Context context, Cursor cursor) {
         mContext = context;
@@ -64,19 +59,49 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
             @Override
             public void bindView(View view, Context context, Cursor cursor) {
-                if (cursor == null)
-                    cursor = getCursor();
                 ((TextView) view).setText(cursor.getString(1));
             }
         };
     }
-
     // Create new views (invoked by the layout manager)
     @Override
     public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                    int viewType) {
-        View v = mCursorAdapter.newView(mContext, mCursorAdapter.getCursor(), parent);
-        return new ViewHolder(v);
+        final View v = mCursorAdapter.newView(mContext, mCursorAdapter.getCursor(), parent);
+        final MyAdapter.ViewHolder holder = new ViewHolder(v, mCursorAdapter.getCursor());
+        v.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                AlertDialog.Builder adb = new AlertDialog.Builder(
+                        v.getContext());
+                adb.setTitle("Remove this alarm?");
+                adb.setPositiveButton("Yes",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                removeItem(holder.getAdapterPosition());
+                            }
+                        });
+                adb.setNegativeButton("NO",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                adb.show();
+
+                return false;
+            }
+        });
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent editAlarm = new Intent(v.getContext(), AlarmSettings.class);
+                v.getContext().startActivity(editAlarm);
+            }
+        });
+        return holder;
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -84,6 +109,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
+        Cursor c = mCursorAdapter.getCursor();
+        c.moveToPosition(holder.getAdapterPosition());
         mCursorAdapter.bindView(holder.titleText, mContext, mCursorAdapter.getCursor());
 
     }
@@ -92,5 +119,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     @Override
     public int getItemCount() {
         return mCursorAdapter.getCount();
+    }
+
+    private void removeItem(int idx) {
+        mCursorAdapter.getCursor().moveToPosition(idx);
+        long id = mCursorAdapter.getCursor()
+                .getLong(mCursorAdapter.getCursor().getColumnIndex("_id"));
+        mContext.getContentResolver().delete(
+                AlarmContract.AlarmEntry.CONTENT_URI,
+                "_id=" + String.valueOf(id),
+                null
+        );
+        mCursorAdapter.getCursor().moveToFirst();
+        this.notifyItemRemoved(idx);
     }
 }

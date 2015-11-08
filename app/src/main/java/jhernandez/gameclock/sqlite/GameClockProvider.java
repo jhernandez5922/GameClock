@@ -26,7 +26,6 @@ public class GameClockProvider  extends ContentProvider{
 
         return matcher;
     }
-
     @Override
     public boolean onCreate() {
         mOpenHelper = new AlarmDbHelper(getContext());
@@ -124,7 +123,7 @@ public class GameClockProvider  extends ContentProvider{
         int rowsDeleted;
 
         if (selection == null)
-            selection = "1";
+            selection = "100";
         switch (match) {
             case ALARM:
                 rowsDeleted = db.delete(AlarmContract.AlarmEntry.TABLE_NAME, selection, selectionArgs);

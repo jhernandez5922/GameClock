@@ -14,7 +14,6 @@ package jhernandez.gameclock;
 
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -32,11 +31,10 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -47,14 +45,12 @@ public class AlarmSettings extends PreferenceActivity {
 
 
     private static final String TAG = AlarmSettings.class.getSimpleName();
-    private static Intent intent;
-    private static int idx;
+    private Alarm alarm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        intent = new Intent();
-        idx = getIntent().getIntExtra("requestCode", 0);
+        alarm = new Alarm();
 
     }
 
@@ -101,6 +97,7 @@ public class AlarmSettings extends PreferenceActivity {
         //set Header for general preferences
         headers.setTitle(R.string.pref_header_general);
         //get preferences from XML resource
+
         addPreferencesFromResource(R.xml.alarm_pref_general);
 
         //Set preferences to default values, only for the first time this called
@@ -149,35 +146,33 @@ public class AlarmSettings extends PreferenceActivity {
 
                 //Add in whether the or not the alarm is active
                 //TODO Replace with delete and move active to above screen
-                intent.putExtra("active"+idx, checked);
+                //intent.putExtra("active"+idx, checked);
 
                 //Format the time from the timePicker and
-                String am_pm;
-                TimePicker timePicker = (TimePicker) findViewById(R.id.timePicker);
-                int hour = timePicker.getCurrentHour(); //get set time
-                int minute = timePicker.getCurrentMinute();
-                if (true) { //TODO ADD 12 HOUR FORMAT
-                    if (hour >= 12) { //if PM
-                        hour = hour == 12 ? 12 : hour - 12;
-                        am_pm = " PM";
-                    } else { //if AM
-                        hour = hour == 0 ? 12 : hour;
-                        am_pm = " AM";
-                    }
-                }
-                else {} //TODO ADD 24 HOUR FORMAT
+                Intent intent = new Intent();
 
-                //Format for string to be sent to alarm manager
-                String time = String.valueOf(hour) + ":"
-                        + String.format("%02d", minute)
-                        + am_pm;
-                //Add to Extras to be sent back
-                intent.putExtra("time"+idx, time);
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                prefs.edit().putInt("lastHour", timePicker.getCurrentHour()).putInt("lastMinute", timePicker.getCurrentMinute()).apply();
+
+                //------------ ADD TIME -----------------------------------------\\
+                TimePicker timePicker = (TimePicker) findViewById(R.id.timePicker);
+                Calendar time = Calendar.getInstance();
+                //TODO Compensate for API 23 vs API < API 23
+                time.set(Calendar.HOUR, timePicker.getCurrentHour());
+                time.set(Calendar.MINUTE, timePicker.getCurrentMinute());
+                time.set(Calendar.SECOND, 0);
+                time.set(Calendar.MILLISECOND, 0);
+                alarm.setAlarmTime(time.getTimeInMillis());
+
+
+                //----------- ADD NAME ----------------------------------------\\
+                alarm.setAlarmName(findPreference("name").getSummary().toString());
+
+                //----------- ADD WEEK ----------------------------------------\\
+                alarm.setEntireWeek(setWeek(findPreference("repeating").getSummary().toString()));
+
+                //Add to Intent
+                intent.putExtra("alarm", alarm);
                 //Let menu activity know results from intent are okay
                 setResult(RESULT_OK, intent);
-
                 //Finish activity and go back
                 finish();
             }
@@ -232,25 +227,11 @@ public class AlarmSettings extends PreferenceActivity {
                 //For MultiSelectListPreference, parse days checked and set in summary
                 String days = getDays(stringValue);
                 preference.setSummary(days);
-                Toast.makeText(preference.getContext(), "days" + idx, Toast.LENGTH_LONG).show();
-                //intent.putExtra("days"+idx, days);
-                //Toast.makeText(preference.getContext(), (String) selections.toArray()[0], Toast.LENGTH_LONG).show();
-
-//            } else if (preference instanceof TimePreference) {
-//                //For TimePreference, changes to 12 Hour or 24 Hour format
-//                // than puts time in the preference summary
-//                if (stringValue.length() > 1) {
-//                    Log.d(TAG, "INDEX VALUE: " +String.valueOf(idx));
-//                    intent.putExtra("time" + idx, stringValue);
-//                    preference.setSummary(stringValue);
 //                }
             }else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
                 preference.setSummary(stringValue);
-                if(preference.getKey().equals("name"))
-                    intent.putExtra("name"+idx, stringValue);
-//                Toast.makeText(preference.getContext(), stringValue, Toast.LENGTH_LONG).show();
             }
             return true;
         }
@@ -276,42 +257,51 @@ public class AlarmSettings extends PreferenceActivity {
                         .getString(preference.getKey(), ""));
     }
 
-    private static String getDays(String value) {
+    private static boolean [] setWeek(String value) {
         List<String> selections = new ArrayList<>(Arrays.asList(value.replaceAll("[^A-Za-z]", " ").split(" ")));
         selections.removeAll(Arrays.asList(""));
-        StringBuilder days = new StringBuilder();
         boolean [] week = new boolean[7];
-        if(selections.contains("Sun")) {
-            days.append("Sun ");
+        if(selections.contains("Sun"))
             week[0] = true;
-        }
-        if(selections.contains("Mon")) {
-            days.append("Mon ");
+        if(selections.contains("Mon"))
             week[1] = true;
-        }
-        if (selections.contains("Tue")) {
-            days.append("Tues ");
+        if (selections.contains("Tue"))
             week[2] = true;
-        }
-        if(selections.contains("Wed")) {
-            days.append("Wed ");
+        if(selections.contains("Wed"))
             week[3] = true;
-        }
-        if (selections.contains("Thu")) {
-            days.append("Thur ");
+        if (selections.contains("Thu"))
             week[4] = true;
-        }
-        if(selections.contains("Fri")) {
-            days.append("Fri ");
+        if(selections.contains("Fri"))
             week[5] = true;
-        }
-        if (selections.contains("Sat")) {
-            days.append("Sat ");
+        if (selections.contains("Sat"))
             week[6] = true;
+        return week;
+    }
+
+    private static String dayOfWeek (int i) {
+        switch(i) {
+            case 0:
+                return "Sun ";
+            case 1:
+                return "Mon ";
+            case 2:
+                return "Tues ";
+            case 3:
+                return "Wed ";
+            case 4:
+                return "Thur ";
+            case 5:
+                return "Fri ";
+            case 6:
+                return "Sat ";
+            default:
+                return "";
         }
-        if(days.toString().equals(""))
-            return "Non-Repeating";
-        intent.putExtra("days"+idx, week);
+    }
+    private static String getDays(String value) {
+        StringBuilder days = new StringBuilder();
+        boolean [] week = setWeek(value);
+        // intent.putExtra("days"+idx, week);
         Queue<Integer> next = new LinkedList<>();
         int hours = 24;
         for (int i = 0; i < 7; i++) {
@@ -319,11 +309,12 @@ public class AlarmSettings extends PreferenceActivity {
                 hours+=24;
                 continue;
             }
+            days.append(dayOfWeek(i));
             next.add(hours);
             hours = 24;
         }
-        intent.putExtra("nextDay"+idx,(Serializable) next);
+        //TODO FIX
+        // intent.putExtra("nextDay"+idx,(Serializable) next);
         return days.toString();
     }
-
 }
