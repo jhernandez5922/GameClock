@@ -285,11 +285,11 @@ public class AlarmSettings extends PreferenceActivity {
             case 1:
                 return "Mon ";
             case 2:
-                return "Tues ";
+                return "Tue ";
             case 3:
                 return "Wed ";
             case 4:
-                return "Thur ";
+                return "Thu ";
             case 5:
                 return "Fri ";
             case 6:

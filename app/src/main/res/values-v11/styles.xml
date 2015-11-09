@@ -12,4 +12,7 @@
         <item name="android:background">@color/black_overlay</item>
     </style>
 
+    <color name="orange_light">#ffbb33</color>
+
+    <color name="orange_dark">#ff8800</color>
 </resources>

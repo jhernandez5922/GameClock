@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.Calendar;
 
@@ -35,7 +36,7 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
     private RecyclerView mRecyclerView;
     private MyAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    public static int buttonCount = 0;
+    private TextView emptyView;
     private static final int FORECAST_LOADER = 0;
 
     public AlarmListFragment() {
@@ -51,27 +52,28 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
                              Bundle savedInstanceState) {
         View v =  inflater.inflate(R.layout.fragment_alarm_list, container, false);
 
+        emptyView = (TextView) v.findViewById(R.id.empty_view);
+        emptyView.setText("No Alarms set, Click the little clock below to get started!");
 
         mRecyclerView = (RecyclerView) v.findViewById(R.id.my_recycler_view);
         mRecyclerView.setHasFixedSize(false);
-        //mRecyclerView.setItemAnimator(new  );
+        //TODO Animations for RecyclerView?
 
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
+
         getActivity().getSupportLoaderManager().initLoader(0, null, this);
         mAdapter = new MyAdapter(getContext(), null);
 
         mRecyclerView.setAdapter(mAdapter);
 
+        //Add more alarms FAB
+        //TODO Add drawable to FAB
         FloatingActionButton newAlarm = (FloatingActionButton) v.findViewById(R.id.fab);
         newAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                buttonCount++;
-                //Alarm a = new Alarm(("Alarm "+ buttonCount), 1230, new boolean[7]);
-                //getContext().getContentResolver().insert(AlarmContract.AlarmEntry.CONTENT_URI, a.contentValues);
-                //mAdapter.notifyItemInserted(mAdapter.getItemCount() + 1);
                 startActivityForResult(new Intent(getContext(), AlarmSettings.class), 1);
             }
         });
@@ -81,7 +83,6 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == FragmentActivity.RESULT_OK) {
-            //Log.v(TAG, "CURRENT: " + data.getStringExtra("time"+requestCode));
 
             //Parse name from extras from activity executed
             Alarm alarm = data.getParcelableExtra("alarm");
@@ -107,9 +108,27 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
         );
     }
 
+
+    /**
+     * Executes when the loader finishes a task, while also checking if the
+     * current list is empty. It replaces the view with a textView that informs
+     * the user to add a new alarm
+     *
+     * @param loader: Loader that finished
+     * @param data: Cursor where the loader altered data
+     * @author Jason Hernandez
+     **/
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.mCursorAdapter.swapCursor(data);
+            if (mAdapter.getItemCount() == 0){
+                mRecyclerView.setVisibility(View.GONE);
+                emptyView.setVisibility(View.VISIBLE);
+            }
+            else {
+                mRecyclerView.setVisibility(View.VISIBLE);
+                emptyView.setVisibility(View.GONE);
+            }
     }
 
     @Override
@@ -117,6 +136,12 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
         mAdapter.mCursorAdapter.swapCursor(null);
     }
 
+    /**
+     * Given a Alarm class, this function will inform the ALARM_SERVICE to set up a new
+     * alarm with the given information from the alarm.
+     * @param alarm: Alarm to be set, see Alarm Class for information
+     * @author Jason Hernandez
+     */
     private void SetAlarm (Alarm alarm) {
         /*
             This function sends the request to the AlarmManager to activate
@@ -134,10 +159,11 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
                 return;
             Calendar alarmSetTime = Calendar.getInstance();
             alarmSetTime.setTimeInMillis(alarm.getAlarmTime());
-            AlarmReceiver.getNearestDay(alarmSetTime, alarm.getWeek());
+            alarmSetTime.set(Calendar.DAY_OF_WEEK, AlarmReceiver.getNearestDay(alarmSetTime, alarm.getWeek()));
             //Set up alarm manager
             AlarmManager alarmMgr = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(getContext(), AlarmReceiver.class);
+            intent.putExtra("alarm", alarm);
             PendingIntent alarmIntent = PendingIntent.getBroadcast(getContext(), alarm.getID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
             int currentApiVersion = Build.VERSION.SDK_INT;
             Log.v("GameClock Alarm Setting", "ALARM SET FOR: " + alarmSetTime.get(Calendar.DAY_OF_WEEK));
@@ -153,4 +179,5 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
                     PackageManager.DONT_KILL_APP);
         }
     }
+
 }

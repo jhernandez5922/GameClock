@@ -42,4 +42,13 @@
             app:pressedTranslationZ="12dp" />
     </LinearLayout>
 
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/empty_view"
+        android:layout_below="@+id/list_title"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
+        android:text="Empty View!"/>
 </RelativeLayout>

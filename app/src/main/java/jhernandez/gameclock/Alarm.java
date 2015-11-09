@@ -15,7 +15,7 @@ public class Alarm implements Parcelable {
     private long time;
     private boolean week [];
     private int ID;
-    private static final String weekName [] = {
+    public static final String weekName [] = {
             AlarmEntry.COLUMN_SUN,
             AlarmEntry.COLUMN_MON,
             AlarmEntry.COLUMN_TUE,
@@ -87,13 +87,14 @@ public class Alarm implements Parcelable {
     //Setters
     public void setAlarmName(String name) {this.name = name; putNameToCV();}
     public void setAlarmTime(long time) {this.time = time; putTimeToCV();}
-    public void setWeekDay (int day, boolean active) {this.week[day] = active; putDayToCV(day);}
+    public void setWeekDay (int day, boolean active) {this.week[day] = active; putDayToCV(day, this.week[day] ? 1 : 0);}
     public void setID(String id) {
         this.ID = Integer.parseInt(id);
     }
     public boolean setEntireWeek(boolean [] week) {
         if (week != null && week.length == 7) {
             this.week = week;
+            putWeekToCV();
             return true;
         }
         return false;
@@ -113,11 +114,11 @@ public class Alarm implements Parcelable {
     }
     private void putWeekToCV() {
         for (int i  = 0; i < 7; i++) {
-            putDayToCV(i);
+            putDayToCV(i, week[i] ? 1 : 0);
         }
     }
-    private void putDayToCV(int i) {
-        contentValues.put(weekName[i], week[i]);
+    private void putDayToCV(int i, int value) {
+        contentValues.put(weekName[i], value);
     }
 
 

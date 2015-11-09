@@ -17,6 +17,13 @@ import java.util.Calendar;
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
+    /**
+     * This function tells the device what to do now that an alarm has been triggered
+     * As of 11/8/15, the function sends a notification to the device with the time.
+     * @param context: Context of the application
+     * @param intent: Intent that send the request
+     * @author Jason Hernandez
+     */
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -49,16 +56,22 @@ public class AlarmReceiver extends BroadcastReceiver {
         nm.notify(0, n);
     }
 
-    public static int getNearestDay (Calendar alarm, boolean [] week) {
+    /**
+     * This function returns the nearest valid day for the alarm to trigger next
+     * @param setTime: time in which the alarm is currently set to
+     * @param week: list of each day of the week, and whether or not they are active
+     * @return returns the valid day, or -1 if anything goes wrong
+     */
+    public static int getNearestDay (Calendar setTime, boolean [] week) {
         Calendar currentTime = Calendar.getInstance();
-        int day = alarm.get(Calendar.DAY_OF_WEEK);
-        if (currentTime.after(alarm))
+        int day = setTime.get(Calendar.DAY_OF_WEEK);
+        if (currentTime.after(setTime))
             day++;
-        if (day > Calendar.SUNDAY)
+        if (day > Calendar.SATURDAY)
             day = 1;
         for (int i = 0; i < 7; i++) {
             if (week[day - 1]) {
-                if(day == alarm.get(Calendar.DAY_OF_WEEK) && i + 1 == 7)
+                if(day == setTime.get(Calendar.DAY_OF_WEEK) && i + 1 == 7)
                     return 8;
                 return day;
             }

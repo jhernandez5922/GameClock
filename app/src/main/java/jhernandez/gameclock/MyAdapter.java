@@ -3,8 +3,8 @@ package jhernandez.gameclock;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -36,6 +36,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             titleText = (TextView) v.findViewById(R.id.card_title);
             card = (CardView) v;
         }
+
     }
     // Provide a suitable constructor (depends on the kind of dataset)
     public MyAdapter(Context context, Cursor cursor) {
@@ -48,7 +49,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                     null,
                     null
             );
-        cursor.moveToFirst();
+            cursor.moveToFirst();
         }
         mCursorAdapter = new CursorAdapter(mContext, cursor, 0) {
             @Override
@@ -59,7 +60,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
             @Override
             public void bindView(View view, Context context, Cursor cursor) {
-                ((TextView) view).setText(cursor.getString(1));
+                ((TextView) view.findViewById(R.id.card_title)).setText(
+                        cursor.getString(cursor.getColumnIndex(AlarmContract.AlarmEntry.COLUMN_NAME)));
+                setUpWeek(view, cursor);
+
             }
         };
     }
@@ -94,13 +98,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 return false;
             }
         });
-        v.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent editAlarm = new Intent(v.getContext(), AlarmSettings.class);
-                v.getContext().startActivity(editAlarm);
-            }
-        });
+//        v.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent editAlarm = new Intent(v.getContext(), AlarmSettings.class);
+//                v.getContext().startActivity(editAlarm);
+//            }
+//        });
         return holder;
     }
 
@@ -111,7 +115,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         // - replace the contents of the view with that element
         Cursor c = mCursorAdapter.getCursor();
         c.moveToPosition(holder.getAdapterPosition());
-        mCursorAdapter.bindView(holder.titleText, mContext, mCursorAdapter.getCursor());
+        mCursorAdapter.bindView(holder.card, mContext, mCursorAdapter.getCursor());
 
     }
 
@@ -132,5 +136,27 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         );
         mCursorAdapter.getCursor().moveToFirst();
         this.notifyItemRemoved(idx);
+    }
+    private void setUpWeek(View v, Cursor cursor) {
+
+        int [] weekViews = new int[] {
+                R.id.sunday_button,
+                R.id.monday_button,
+                R.id.tuesday_button,
+                R.id.wednesday_button,
+                R.id.thursday_button,
+                R.id.friday_button,
+                R.id.saturday_button
+        };
+        boolean [] week = new boolean[7];
+        for (int i = 0; i < 7; i++) {
+            int temp = cursor.getInt(cursor.getColumnIndex(Alarm.weekName[i]));
+            week[i] = temp == 1;
+            TextView tv = (TextView) v.findViewById(weekViews[i]);
+            tv.setTextColor(
+                    week[i] ? Color.parseColor("#FFBB33")
+                            : Color.parseColor("#FF8800")
+            );
+        }
     }
 }
