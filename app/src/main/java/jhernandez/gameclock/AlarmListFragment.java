@@ -1,14 +1,8 @@
 package jhernandez.gameclock;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -18,13 +12,10 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.util.Calendar;
 
 import jhernandez.gameclock.sqlite.AlarmContract;
 
@@ -39,7 +30,7 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
     private TextView emptyView;
     private static final int FORECAST_LOADER = 0;
 
-    public AlarmListFragment() {
+    public AlarmListFragment() { 
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -88,11 +79,11 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
             Alarm alarm = data.getParcelableExtra("alarm");
             if (alarm.readyToInsert()) {
                 Uri result = getContext().getContentResolver().insert(AlarmContract.AlarmEntry.CONTENT_URI, alarm.contentValues);
-                mAdapter.notifyDataSetChanged();
+                //mAdapter.notifyDataSetChanged();
                 alarm.setID(result.getLastPathSegment());
             }
             //Create Alarm
-            SetAlarm(alarm);
+            AlarmReceiver.setAlarm(getContext(), alarm);
         }
     }
     @Override
@@ -120,64 +111,35 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
      **/
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mAdapter.mCursorAdapter.swapCursor(data);
-            if (mAdapter.getItemCount() == 0){
-                mRecyclerView.setVisibility(View.GONE);
-                emptyView.setVisibility(View.VISIBLE);
-            }
-            else {
-                mRecyclerView.setVisibility(View.VISIBLE);
-                emptyView.setVisibility(View.GONE);
-            }
+        if(data.getCount() > mAdapter.mCursorAdapter.getCount()) {
+            mAdapter.mCursorAdapter.swapCursor(data);
+            mAdapter.notifyItemInserted(mAdapter.getItemCount());
+        }
+        else if (data.getCount() < mAdapter.mCursorAdapter.getCount()) {
+            mAdapter.mCursorAdapter.swapCursor(data);
+            if (mAdapter.removed > 0 && mAdapter.removed < mAdapter.getItemCount())
+                mAdapter.notifyItemRemoved(mAdapter.removed);
+            else
+                mAdapter.notifyDataSetChanged();
+            mAdapter.removed = -1;
+        }
+        else {
+            mAdapter.mCursorAdapter.swapCursor(data);
+            mAdapter.notifyDataSetChanged();
+        }
+        if (mAdapter.getItemCount() == 0){
+            mRecyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.mCursorAdapter.swapCursor(null);
-    }
-
-    /**
-     * Given a Alarm class, this function will inform the ALARM_SERVICE to set up a new
-     * alarm with the given information from the alarm.
-     * @param alarm: Alarm to be set, see Alarm Class for information
-     * @author Jason Hernandez
-     */
-    private void SetAlarm (Alarm alarm) {
-        /*
-            This function sends the request to the AlarmManager to activate
-            the alarm at the given time.
-         */
-        if (alarm.isActive()) {
-            /*
-                Formats the time send from settings screen to be read by
-                alarm manager
-             */
-
-            if (alarm.invalidValues())
-                return;
-            if (alarm.getAlarmTime() == 0)  //time was set for alarm and
-                return;
-            Calendar alarmSetTime = Calendar.getInstance();
-            alarmSetTime.setTimeInMillis(alarm.getAlarmTime());
-            alarmSetTime.set(Calendar.DAY_OF_WEEK, AlarmReceiver.getNearestDay(alarmSetTime, alarm.getWeek()));
-            //Set up alarm manager
-            AlarmManager alarmMgr = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
-            Intent intent = new Intent(getContext(), AlarmReceiver.class);
-            intent.putExtra("alarm", alarm);
-            PendingIntent alarmIntent = PendingIntent.getBroadcast(getContext(), alarm.getID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            int currentApiVersion = Build.VERSION.SDK_INT;
-            Log.v("GameClock Alarm Setting", "ALARM SET FOR: " + alarmSetTime.get(Calendar.DAY_OF_WEEK));
-            if (currentApiVersion >= Build.VERSION_CODES.KITKAT)
-                alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarmSetTime.getTimeInMillis(), alarmIntent);
-            else
-                alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmSetTime.getTimeInMillis(), alarmIntent);
-            //Tell receiver to wake up device when alarm triggers
-            ComponentName receiver = new ComponentName(getContext(), AlarmReceiver.class);
-            PackageManager pm = getContext().getPackageManager();
-            pm.setComponentEnabledSetting(receiver,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP);
-        }
     }
 
 }

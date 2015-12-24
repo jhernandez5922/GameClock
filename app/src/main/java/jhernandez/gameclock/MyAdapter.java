@@ -5,13 +5,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
 import android.widget.TextView;
+
+import java.text.SimpleDateFormat;
 
 import jhernandez.gameclock.sqlite.AlarmContract;
 
@@ -22,6 +24,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     CursorAdapter mCursorAdapter;
     private Context mContext;
+    public int removed = 0;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -62,6 +65,9 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             public void bindView(View view, Context context, Cursor cursor) {
                 ((TextView) view.findViewById(R.id.card_title)).setText(
                         cursor.getString(cursor.getColumnIndex(AlarmContract.AlarmEntry.COLUMN_NAME)));
+                long id = cursor.getLong(cursor.getColumnIndex(AlarmContract.AlarmEntry.COLUMN_TIME));
+                SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+                ((TextView) view.findViewById(R.id.digital_clock)).setText(sdf.format(id));
                 setUpWeek(view, cursor);
 
             }
@@ -115,7 +121,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         // - replace the contents of the view with that element
         Cursor c = mCursorAdapter.getCursor();
         c.moveToPosition(holder.getAdapterPosition());
-        mCursorAdapter.bindView(holder.card, mContext, mCursorAdapter.getCursor());
+        mCursorAdapter.bindView(holder.card, mContext, c);
 
     }
 
@@ -127,6 +133,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     private void removeItem(int idx) {
         mCursorAdapter.getCursor().moveToPosition(idx);
+        removed = idx;
         long id = mCursorAdapter.getCursor()
                 .getLong(mCursorAdapter.getCursor().getColumnIndex("_id"));
         mContext.getContentResolver().delete(
@@ -135,7 +142,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 null
         );
         mCursorAdapter.getCursor().moveToFirst();
-        this.notifyItemRemoved(idx);
+
     }
     private void setUpWeek(View v, Cursor cursor) {
 
