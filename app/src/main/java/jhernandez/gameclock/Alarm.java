@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.concurrent.TimeUnit;
+
 import jhernandez.gameclock.sqlite.AlarmContract.AlarmEntry;
 
 /**
@@ -88,6 +90,10 @@ public class Alarm implements Parcelable {
     public void setAlarmName(String name) {this.name = name; putNameToCV();}
     public void setAlarmTime(long time) {this.time = time; putTimeToCV();}
     public void setWeekDay (int day, boolean active) {this.week[day] = active; putDayToCV(day, this.week[day] ? 1 : 0);}
+    public void advanceDays(long days) {
+        days = TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS);
+        this.time += days;
+    }
     public void setID(String id) {
         this.ID = Integer.parseInt(id);
     }

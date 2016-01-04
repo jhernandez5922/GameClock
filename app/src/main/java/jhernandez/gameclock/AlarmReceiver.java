@@ -104,11 +104,13 @@ public class AlarmReceiver extends BroadcastReceiver {
 
             if (alarm.invalidValues())
                 return;
-            if (alarm.getAlarmTime() == 0)  //time was set for alarm and
+            if (alarm.getAlarmTime() == 0)
                 return;
             Calendar alarmSetTime = Calendar.getInstance();
             alarmSetTime.setTimeInMillis(alarm.getAlarmTime());
-            alarmSetTime.set(Calendar.DAY_OF_WEEK, AlarmReceiver.getNearestDay(alarmSetTime, alarm.getWeek()));
+            int day = AlarmReceiver.getNearestDay(alarmSetTime, alarm.getWeek());
+            alarm.advanceDays(day - alarmSetTime.get(Calendar.DAY_OF_WEEK));
+            alarmSetTime.set(Calendar.DAY_OF_WEEK, day);
             //Set up alarm manager
             AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             Intent intent = new Intent(context, AlarmReceiver.class);

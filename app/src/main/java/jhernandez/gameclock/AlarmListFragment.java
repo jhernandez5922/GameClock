@@ -30,7 +30,7 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
     private TextView emptyView;
     private static final int FORECAST_LOADER = 0;
 
-    public AlarmListFragment() { 
+    public AlarmListFragment() {
     }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
