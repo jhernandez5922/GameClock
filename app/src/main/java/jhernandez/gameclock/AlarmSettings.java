@@ -17,6 +17,7 @@ import android.content.Intent;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
@@ -50,7 +51,10 @@ public class AlarmSettings extends PreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        alarm = new Alarm();
+        alarm = getIntent().getParcelableExtra("alarm");
+        if (alarm == null) {
+            alarm = new Alarm();
+        }
 
     }
 
@@ -156,8 +160,14 @@ public class AlarmSettings extends PreferenceActivity {
                 TimePicker timePicker = (TimePicker) findViewById(R.id.timePicker);
                 Calendar time = Calendar.getInstance();
                 //TODO Compensate for API 23 vs API < API 23
-                time.set(Calendar.HOUR, timePicker.getCurrentHour());
-                time.set(Calendar.MINUTE, timePicker.getCurrentMinute());
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                    time.set(Calendar.HOUR_OF_DAY, timePicker.getCurrentHour());
+                    time.set(Calendar.MINUTE, timePicker.getCurrentMinute());
+                }
+                else {
+                    time.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+                    time.set(Calendar.MINUTE, timePicker.getMinute());
+                }
                 time.set(Calendar.SECOND, 0);
                 time.set(Calendar.MILLISECOND, 0);
                 alarm.setAlarmTime(time.getTimeInMillis());

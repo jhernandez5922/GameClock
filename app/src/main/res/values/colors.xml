@@ -2,4 +2,12 @@
 
     <color name="black_overlay">#66000000</color>
 
+    <color name="color_accent">#7baac4</color>
+
+    <color name="color_primary">#299161</color>
+
+    <color name="color_verify_green">#656568</color>
+
+    <color name="gray_background">#757575</color>
+    <color name="yellow">#FFBB33</color>
 </resources>

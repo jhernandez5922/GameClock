@@ -3,21 +3,33 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="jhernandez.gameclock.AlarmListFragment"
     android:fitsSystemWindows="true">
 
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/alarms_title"
-        android:id="@+id/list_title"
-        android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
-        android:gravity="center"/>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/my_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/color_primary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/alarms_title"
+            android:id="@+id/list_title"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
+            android:textColor="@color/color_accent"
+            android:gravity="center"/>
+
+    </android.support.v7.widget.Toolbar>
+
 
     <android.support.v7.widget.RecyclerView
-        android:layout_below="@+id/list_title"
+        android:layout_below="@+id/my_toolbar"
         android:id="@+id/my_recycler_view"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
@@ -46,9 +58,8 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:id="@+id/empty_view"
-        android:layout_below="@+id/list_title"
-        android:layout_marginTop="20dp"
         android:gravity="center_horizontal"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
-        android:text="Empty View!"/>
+        android:text="Empty View!"
+        android:layout_below="@+id/my_toolbar" />
 </RelativeLayout>

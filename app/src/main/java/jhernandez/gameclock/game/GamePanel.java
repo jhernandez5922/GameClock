@@ -15,11 +15,12 @@ import jhernandez.gameclock.R;
  */
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
-    public static final float WIDTH= 856;
-    public static final float HEIGHT = 480;
+    public static final int WIDTH= 856;
+    public static final int HEIGHT = 480;
     public static final int MOVESPEED = -5;
     private MainThread thread;
     private Background bg;
+    private Player currentPlayer;
 
     public GamePanel(Context context) {
         super(context);
@@ -35,7 +36,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     public void surfaceCreated(SurfaceHolder holder) {
 
         bg = new Background(BitmapFactory.decodeResource(getResources(), R.drawable.grassbg1));
-
+        currentPlayer = new Player(BitmapFactory.decodeResource(getResources(), R.drawable.helicopter), 65, 25, 3);
         thread.setRunning(true);
         thread.start();
     }
@@ -48,38 +49,59 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         boolean retry = true;
-        while(retry) {
+        int counter = 0;
+        while(retry && counter < 1000) {
+            counter++;
             try {
                 thread.setRunning(false);
                 thread.join();
+                retry = false;
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            retry = false;
         }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+            if(!currentPlayer.isPlaying()) {
+                currentPlayer.setPlaying(true);
+            }
+            else {
+                currentPlayer.setUP(true);
+            }
+            return true;
+        }
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            currentPlayer.setUP(false);
+            return true;
+        }
         return super.onTouchEvent(event);
     }
 
     public void update() {
         bg.update();
+        if (currentPlayer.isPlaying()) {
+            currentPlayer.update();
+        }
     }
 
     @Override
     public void draw(Canvas canvas) {
-        final float scaleFactorX = getWidth()/WIDTH;
-        final float scaleFactorY = getHeight()/HEIGHT;
+        final float scaleFactorX = getWidth()/(WIDTH*1.f);
+        final float scaleFactorY = getHeight()/(HEIGHT*1.f);
 
         if(canvas != null) {
             final int savedState = canvas.save();
             canvas.scale(scaleFactorX, scaleFactorY);
             bg.draw(canvas);
+            currentPlayer.draw(canvas);
             canvas.restoreToCount(savedState);
         }
     }
+
 
     /**
      * Created by Jason on 10/12/2015.
@@ -133,7 +155,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
                     }
                 }
                 timeMillis = (System.nanoTime() - startTime)/1000000;
-                waitTime = targetTime - timeMillis;
+                waitTime = Math.abs(targetTime - timeMillis);
 
 
                 try {

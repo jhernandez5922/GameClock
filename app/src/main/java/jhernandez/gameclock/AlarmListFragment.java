@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import jhernandez.gameclock.game.TestActivity;
 import jhernandez.gameclock.sqlite.AlarmContract;
 
 /**
@@ -59,6 +60,41 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
 
         mRecyclerView.setAdapter(mAdapter);
 
+//        final SwipeToDismissTouchListener<RecyclerViewAdapter> touchListener =
+//                new SwipeToDismissTouchListener<>(
+//                        new RecyclerViewAdapter(mRecyclerView),
+//                        new SwipeToDismissTouchListener.DismissCallbacks<RecyclerViewAdapter>() {
+//                            @Override
+//                            public boolean canDismiss(int position) {
+//                                return true;
+//                            }
+//
+//                            @Override
+//                            public void onDismiss(RecyclerViewAdapter view, int position) {
+//                                mAdapter.removeItem(position);
+//                            }
+//                        });
+//
+//        mRecyclerView.setOnTouchListener(touchListener);
+//        mRecyclerView.setOnScrollListener((RecyclerView.OnScrollListener)touchListener.makeScrollListener());
+//        mRecyclerView.addOnItemTouchListener(new SwipeableItemClickListener(getContext(),
+//                new OnItemClickListener() {
+//                    @Override
+//                    public void onItemClick(View view, int position) {
+//                        if (view.getId() == R.id.txt_delete) {
+//                            touchListener.processPendingDismisses();
+//                        } else if (view.getId() == R.id.txt_undo) {
+//                            touchListener.undoPendingDismiss();
+//                        } else { // R.id.txt_data
+//                            Toast.makeText(getContext(), "Position " + position, Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                }) {
+//            @Override
+//            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+//            }
+//        });
+
         //Add more alarms FAB
         //TODO Add drawable to FAB
         FloatingActionButton newAlarm = (FloatingActionButton) v.findViewById(R.id.fab);
@@ -66,6 +102,13 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
             @Override
             public void onClick(View v) {
                 startActivityForResult(new Intent(getContext(), AlarmSettings.class), 1);
+            }
+        });
+        newAlarm.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                startActivity(new Intent(getContext(), TestActivity.class));
+                return true;
             }
         });
         return v;

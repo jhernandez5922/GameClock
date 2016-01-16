@@ -1,17 +1,20 @@
 package jhernandez.gameclock;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.database.Cursor;
-import android.graphics.Color;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.daimajia.swipe.SimpleSwipeListener;
+import com.daimajia.swipe.SwipeLayout;
 
 import java.text.SimpleDateFormat;
 
@@ -33,11 +36,21 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         // each data item is just a string in this case
         protected TextView titleText;
         protected CardView card;
+        SwipeLayout swipeLayout;
+        ImageView buttonDelete;
 
         public ViewHolder(View v, final Cursor cursor) {
             super(v);
             titleText = (TextView) v.findViewById(R.id.card_title);
             card = (CardView) v;
+            swipeLayout = (SwipeLayout) v.findViewById(R.id.swipe);
+            buttonDelete = (ImageView) v.findViewById(R.id.delete);
+            v.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(v.getContext(), "onItemSelected: " + titleText.getText().toString(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
 
     }
@@ -70,6 +83,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 ((TextView) view.findViewById(R.id.digital_clock)).setText(sdf.format(id));
                 setUpWeek(view, cursor);
 
+
             }
         };
     }
@@ -79,31 +93,31 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                                                    int viewType) {
         final View v = mCursorAdapter.newView(mContext, mCursorAdapter.getCursor(), parent);
         final MyAdapter.ViewHolder holder = new ViewHolder(v, mCursorAdapter.getCursor());
-        v.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                AlertDialog.Builder adb = new AlertDialog.Builder(
-                        v.getContext());
-                adb.setTitle("Remove this alarm?");
-                adb.setPositiveButton("Yes",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                removeItem(holder.getAdapterPosition());
-                            }
-                        });
-                adb.setNegativeButton("NO",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-                adb.show();
-
-                return false;
-            }
-        });
+//        v.setOnLongClickListener(new View.OnLongClickListener() {
+//            @Override
+//            public boolean onLongClick(View view) {
+//                AlertDialog.Builder adb = new AlertDialog.Builder(
+//                        v.getContext());
+//                adb.setTitle("Remove this alarm?");
+//                adb.setPositiveButton("Yes",
+//                        new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                removeItem(holder.getAdapterPosition());
+//                            }
+//                        });
+//                adb.setNegativeButton("NO",
+//                        new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialog, int which) {
+//                                dialog.dismiss();
+//                            }
+//                        });
+//                adb.show();
+//
+//                return false;
+//            }
+//        });
 //        v.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -116,11 +130,33 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         Cursor c = mCursorAdapter.getCursor();
         c.moveToPosition(holder.getAdapterPosition());
+        holder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+        holder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
+            @Override
+            public void onOpen(SwipeLayout layout) {
+                //YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
+            }
+        });
+        holder.swipeLayout.setOnDoubleClickListener(new SwipeLayout.DoubleClickListener() {
+            @Override
+            public void onDoubleClick(SwipeLayout layout, boolean surface) {
+                Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show();
+            }
+        });
+        holder.buttonDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                removeItem(position);
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position, mCursorAdapter.getCount());
+                Toast.makeText(view.getContext(), "Deleted " + holder.titleText.getText().toString() + "!", Toast.LENGTH_SHORT).show();
+            }
+        });
         mCursorAdapter.bindView(holder.card, mContext, c);
 
     }
@@ -131,7 +167,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         return mCursorAdapter.getCount();
     }
 
-    private void removeItem(int idx) {
+    public void removeItem(int idx) {
         mCursorAdapter.getCursor().moveToPosition(idx);
         removed = idx;
         long id = mCursorAdapter.getCursor()
@@ -161,8 +197,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             week[i] = temp == 1;
             TextView tv = (TextView) v.findViewById(weekViews[i]);
             tv.setTextColor(
-                    week[i] ? Color.parseColor("#FFBB33")
-                            : Color.parseColor("#FF8800")
+                    week[i] ? ContextCompat.getColor(v.getContext(), R.color.color_primary)
+                            : ContextCompat.getColor(v.getContext(), R.color.color_verify_green)
             );
         }
     }

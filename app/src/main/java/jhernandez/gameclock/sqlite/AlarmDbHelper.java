@@ -1,10 +1,11 @@
 package jhernandez.gameclock.sqlite;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-
+import jhernandez.gameclock.Alarm;
 import jhernandez.gameclock.sqlite.AlarmContract.AlarmEntry;
 
 /**
@@ -45,4 +46,27 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + AlarmEntry.TABLE_NAME);
     }
+
+
+    public static String getAlarmName(Cursor cursor) {
+        return cursor.getString(cursor.getColumnIndex(AlarmEntry.COLUMN_NAME));
+    }
+
+    public static long getAlarmTime(Cursor cursor) {
+        return cursor.getLong(cursor.getColumnIndex(AlarmEntry.COLUMN_TIME));
+    }
+
+    public static boolean [] getAlarmWeek (Cursor cursor) {
+        boolean [] week = new boolean [7];
+        for (int i = 0; i < week.length; i++) {
+            week[i] = cursor.getInt(cursor.getColumnIndex(Alarm.weekName[i])) == 1;
+        }
+        return week;
+    }
+
+    public static int getAlarmID(Cursor cursor) {
+        return cursor.getInt(cursor.getColumnIndex(AlarmEntry._ID));
+    }
+
+
 }

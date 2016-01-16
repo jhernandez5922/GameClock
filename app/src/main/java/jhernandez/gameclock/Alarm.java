@@ -1,12 +1,14 @@
 package jhernandez.gameclock;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.concurrent.TimeUnit;
 
 import jhernandez.gameclock.sqlite.AlarmContract.AlarmEntry;
+import jhernandez.gameclock.sqlite.AlarmDbHelper;
 
 /**
  * Created by Jason on 11/6/2015.
@@ -28,7 +30,7 @@ public class Alarm implements Parcelable {
     };
     ContentValues contentValues;
 
-    //Constructors
+    //Default constructor
     public Alarm() {
         name = "";
         time = 0;
@@ -37,6 +39,8 @@ public class Alarm implements Parcelable {
         ID = -1;
         putToCV();
     }
+
+    //Takes inputs and maps to Alarm class
     public Alarm(String name, long time, boolean [] week, int ID) {
         this.name = name;
         this.time = time;
@@ -47,11 +51,22 @@ public class Alarm implements Parcelable {
         putToCV();
     }
 
+    //Puts Parcelable values into an Alarm
     protected Alarm(Parcel in) {
         name = in.readString();
         time = in.readLong();
         week = in.createBooleanArray();
         contentValues = ContentValues.CREATOR.createFromParcel(in);
+    }
+
+    //Puts Database values into an Alarm
+    public Alarm(Cursor cursor) {
+        this.name = AlarmDbHelper.getAlarmName(cursor);
+        this.time = AlarmDbHelper.getAlarmTime(cursor);
+        this.week = AlarmDbHelper.getAlarmWeek(cursor);
+        this.ID = AlarmDbHelper.getAlarmID(cursor);
+        contentValues = new ContentValues();
+        putToCV();
     }
 
     //Getters

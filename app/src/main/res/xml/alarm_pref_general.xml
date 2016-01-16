@@ -6,7 +6,7 @@
         android:name="Pick a Time"
         android:key="@string/time_picker" />
 
-        <CheckBoxPreference
+    <CheckBoxPreference
         android:key="active"
         android:title="@string/alarm_active"
         android:defaultValue="true" />
@@ -34,10 +34,10 @@
         android:entryValues="@array/days_entries"
         android:defaultValue="@array/days_of_week"/>
     <!--<CheckBoxPreference-->
-        <!--android:name="time_format"-->
-        <!--android:title="Time format"-->
-        <!--android:summary="12 Hour format"-->
-        <!--android:defaultValue="true"-->
-        <!--android:key="@string/time_format_key"-->
-        <!--/>-->
+    <!--android:name="time_format"-->
+    <!--android:title="Time format"-->
+    <!--android:summary="12 Hour format"-->
+    <!--android:defaultValue="true"-->
+    <!--android:key="@string/time_format_key"-->
+    <!--/>-->
 </PreferenceScreen>
