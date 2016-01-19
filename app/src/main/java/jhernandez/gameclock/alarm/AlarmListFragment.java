@@ -1,4 +1,4 @@
-package jhernandez.gameclock;
+package jhernandez.gameclock.alarm;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -17,7 +17,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import jhernandez.gameclock.game.TestActivity;
+import jhernandez.gameclock.R;
+import jhernandez.gameclock.alarm.creation.EditAlarm;
+import jhernandez.gameclock.game.GameActivity;
 import jhernandez.gameclock.sqlite.AlarmContract;
 
 /**
@@ -26,7 +28,7 @@ import jhernandez.gameclock.sqlite.AlarmContract;
 public class AlarmListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
     private RecyclerView mRecyclerView;
-    private MyAdapter mAdapter;
+    private AlarmAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private TextView emptyView;
     private static final int FORECAST_LOADER = 0;
@@ -56,7 +58,7 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         getActivity().getSupportLoaderManager().initLoader(0, null, this);
-        mAdapter = new MyAdapter(getContext(), null);
+        mAdapter = new AlarmAdapter(getContext(), null);
 
         mRecyclerView.setAdapter(mAdapter);
 
@@ -101,13 +103,13 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
         newAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(getContext(), AlarmSettings.class), 1);
+                startActivityForResult(new Intent(getContext(), EditAlarm.class), 1);
             }
         });
         newAlarm.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                startActivity(new Intent(getContext(), TestActivity.class));
+                startActivity(new Intent(getContext(), GameActivity.class));
                 return true;
             }
         });
@@ -122,11 +124,10 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
             Alarm alarm = data.getParcelableExtra("alarm");
             if (alarm.readyToInsert()) {
                 Uri result = getContext().getContentResolver().insert(AlarmContract.AlarmEntry.CONTENT_URI, alarm.contentValues);
-                //mAdapter.notifyDataSetChanged();
                 alarm.setID(result.getLastPathSegment());
             }
             //Create Alarm
-            AlarmReceiver.setAlarm(getContext(), alarm);
+            AlarmReceiver.setAlarm(getActivity().getApplicationContext(), alarm);
         }
     }
     @Override

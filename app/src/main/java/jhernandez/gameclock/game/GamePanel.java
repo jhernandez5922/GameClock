@@ -9,6 +9,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import jhernandez.gameclock.R;
+import jhernandez.gameclock.game.objects.Background;
+import jhernandez.gameclock.game.objects.Player;
 
 /**
  * Created by Jason on 10/12/2015.

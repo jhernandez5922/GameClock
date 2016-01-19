@@ -5,7 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import jhernandez.gameclock.Alarm;
+import jhernandez.gameclock.alarm.Alarm;
 import jhernandez.gameclock.sqlite.AlarmContract.AlarmEntry;
 
 /**
@@ -28,6 +28,7 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
                 AlarmEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 AlarmEntry.COLUMN_NAME + " TEXT NOT NULL," +
                 AlarmEntry.COLUMN_TIME + " INTEGER NOT NULL," +
+                AlarmEntry.COLUMN_ACTIVE + " INTEGER NOT NULL, " +
                 AlarmEntry.COLUMN_SUN + " INTEGER NOT NULL," +
                 AlarmEntry.COLUMN_MON + " INTEGER NOT NULL," +
                 AlarmEntry.COLUMN_TUE + " INTEGER NOT NULL," +
@@ -66,6 +67,10 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
 
     public static int getAlarmID(Cursor cursor) {
         return cursor.getInt(cursor.getColumnIndex(AlarmEntry._ID));
+    }
+
+    public static boolean getAlarmActive (Cursor cursor) {
+        return cursor.getInt(cursor.getColumnIndex(AlarmEntry.COLUMN_ACTIVE)) == 1;
     }
 
 

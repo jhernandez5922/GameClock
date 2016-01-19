@@ -1,13 +1,22 @@
 <resources>
 
+
+
+    <color name="color_accent">#5c5b5c</color>
+
+    <color name="color_primary">#e89339</color>
+
+    <color name="color_primary_dark">#7e4b21</color>
+
+
+
+    <color name="yellow">#FFBB33</color>
+
+    <color name="white_background">#e0e0e0</color>
+
     <color name="black_overlay">#66000000</color>
 
-    <color name="color_accent">#7baac4</color>
+    <color name="green_edit">#63c64e</color>
 
-    <color name="color_primary">#299161</color>
-
-    <color name="color_verify_green">#656568</color>
-
-    <color name="gray_background">#757575</color>
-    <color name="yellow">#FFBB33</color>
+    <color name="red_delete">#c53d2e</color>
 </resources>

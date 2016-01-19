@@ -1,4 +1,4 @@
-package jhernandez.gameclock;
+package jhernandez.gameclock.alarm;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -12,12 +12,21 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import jhernandez.gameclock.R;
+
 /**
+ * This class holds the methods to receive alarm triggers and even to set or deactivate alarms.
+ *
+ *
+ *
  * Created by Jason on 9/5/2015.
+ * Last updated: 1/16/15 by Jason
+ *
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -26,7 +35,8 @@ public class AlarmReceiver extends BroadcastReceiver {
      * As of 11/8/15, the function sends a notification to the device with the time.
      * @param context: Context of the application
      * @param intent: Intent that send the request
-     * @author Jason Hernandez
+     *
+     *
      */
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -36,20 +46,15 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 
         //Deactivate alarm repeating
-        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        Intent i = new Intent(context,AlarmReceiver.class);
-        PendingIntent p = PendingIntent.getBroadcast(context, 0, i, 0);
-        am.cancel(p);
-        p.cancel();
 
-
+        Alarm alarm = intent.getParcelableExtra("alarm");
+        AlarmReceiver.deactivateAlarm(context, alarm);
 
         NotificationManager nm = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        Alarm alarm = intent.getParcelableExtra("alarm");
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
         builder.setSmallIcon(R.drawable.explosion)
                 .setContentTitle(alarm.getAlarmName() + " went off!")
@@ -91,38 +96,68 @@ public class AlarmReceiver extends BroadcastReceiver {
         return -1;
     }
 
-    public static void setAlarm (Context context, Alarm alarm) {
-        /*
-            This function sends the request to the AlarmManager to activate
-            the alarm at the given time.
-         */
-        if (alarm.isActive()) {
-            /*
-                Formats the time send from settings screen to be read by
-                alarm manager
-             */
+    /**
+     *  This function sends the request to the AlarmManager to deactivate the given alarm.
+     * @param context
+     * @param alarm
+     */
+    public static void deactivateAlarm(Context context, Alarm alarm) {
+        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        PendingIntent p = PendingIntent.getBroadcast(context, alarm.getID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        am.cancel(p);
+        p.cancel();
+        SimpleDateFormat sdf = new SimpleDateFormat("M/d/y h:mm a");
+        Log.v("GameClock Alarm Setting", "alarm disabled: " + sdf.format(alarm.getAlarmTime()));
+        alarm.setActive(false);
+        Toast.makeText(context, alarm.getAlarmName() + " disabled for: " + sdf.format(alarm.getAlarmTime()), Toast.LENGTH_SHORT).show();
 
-            if (alarm.invalidValues())
-                return;
-            if (alarm.getAlarmTime() == 0)
-                return;
+    }
+
+
+    /**
+     * This function sends the request to the AlarmManager to activate the given alarm
+     * @param context: To allow the intent to be within the correct context
+     * @param alarm: The alarm to be set
+     *
+     */
+    public static void setAlarm (Context context, Alarm alarm) {
+
+        if (alarm.isValid()) {
+
+            //Get next time and update alarm
             Calendar alarmSetTime = Calendar.getInstance();
             alarmSetTime.setTimeInMillis(alarm.getAlarmTime());
             int day = AlarmReceiver.getNearestDay(alarmSetTime, alarm.getWeek());
+            if (day == -1) {
+                return;
+            }
             alarm.advanceDays(day - alarmSetTime.get(Calendar.DAY_OF_WEEK));
             alarmSetTime.set(Calendar.DAY_OF_WEEK, day);
+            alarm.setAlarmTime(alarmSetTime.getTimeInMillis());
+
+
             //Set up alarm manager
             AlarmManager alarmMgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-            Intent intent = new Intent(context, AlarmReceiver.class);
+            Intent intent =  new Intent(context, AlarmReceiver.class);
             intent.putExtra("alarm", alarm);
             PendingIntent alarmIntent = PendingIntent.getBroadcast(context, alarm.getID(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            //Set alarm
             int currentApiVersion = Build.VERSION.SDK_INT;
-            SimpleDateFormat sdf = new SimpleDateFormat("M:d:h:mm a");
-            Log.v("GameClock Alarm Setting", "ALARM SET FOR: " + sdf.format(alarmSetTime.getTime()));
             if (currentApiVersion >= Build.VERSION_CODES.KITKAT)
                 alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarmSetTime.getTimeInMillis(), alarmIntent);
             else
                 alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmSetTime.getTimeInMillis(), alarmIntent);
+
+
+
+            //Notify set
+            SimpleDateFormat sdf = new SimpleDateFormat("M/d/y h:mm a");
+            Log.v("GameClock Alarm Setting", alarm.getAlarmName().toUpperCase() + " SET FOR: " + sdf.format(alarmSetTime.getTime()));
+            Toast.makeText(context, alarm.getAlarmName() + " set for: " + sdf.format(alarm.getAlarmTime()), Toast.LENGTH_SHORT).show();
+
+
             //Tell receiver to wake up device when alarm triggers
             ComponentName receiver = new ComponentName(context, AlarmReceiver.class);
             PackageManager pm = context.getPackageManager();

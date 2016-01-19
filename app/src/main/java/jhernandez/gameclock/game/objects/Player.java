@@ -1,7 +1,10 @@
-package jhernandez.gameclock.game;
+package jhernandez.gameclock.game.objects;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+
+import jhernandez.gameclock.game.GameAnimator;
+import jhernandez.gameclock.game.GamePanel;
 
 /**
  * Created by Jason on 1/11/2016.
@@ -11,7 +14,7 @@ public class Player extends GameObject {
     private int score;
     private boolean up;
     private boolean playing;
-    private GameAnimation animation = new GameAnimation();
+    private GameAnimator animation = new GameAnimator();
     private long startTime;
 
     public Player (Bitmap res, int w, int h, int numFrames) {

@@ -4,7 +4,6 @@
     android:id="@+id/card"
     android:layout_width="match_parent"
     android:layout_height="150dp"
-    android:background="@color/gray_background"
     android:layout_marginBottom="5dp" >
 
     <com.daimajia.swipe.SwipeLayout xmlns:swipe="http://schemas.android.com/apk/res-auto"
@@ -14,34 +13,36 @@
         swipe:leftEdgeSwipeOffset="0dp"
         swipe:rightEdgeSwipeOffset="0dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:layout_width="70dp"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:visibility="gone"
-            android:background="@color/gray_background"
-            android:weightSum="3">
+            android:visibility="gone">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:id="@+id/txt_delete"
-                android:gravity="center_vertical"
-                android:textSize="48dp"
-                android:text="Delete?"
-                android:clickable="false"
-                android:layout_weight="2"
-                android:hapticFeedbackEnabled="true"
-                android:textColor="#FF5534"/>
+                <ImageView
+                    android:id="@+id/delete"
+                    android:contentDescription="Delete"
+                    android:layout_width="70dp"
+                    android:layout_height="match_parent"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true"
+                    android:background="@color/color_primary_dark"
+                    android:src="@drawable/trash_recyclebin_empty_closed"
+                    />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:tag="Bottom4"
+            android:id="@+id/bottom_wrapper_2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/delete"
-                android:contentDescription="Delete"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#FF5534"
-                android:src="@android:drawable/ic_menu_delete" />
+                android:id="@+id/magnifier2"
+                android:src="@android:drawable/ic_menu_save"
+                android:layout_width="70dp"
+                android:background="@color/color_primary_dark"
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 
@@ -65,6 +66,7 @@
                 android:layout_marginRight="5dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
+                android:buttonTint="@color/color_primary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView
@@ -99,7 +101,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
-                    android:textColor="@color/color_verify_green"
+                    android:textColor="@color/color_primary_dark"
                     android:textSize="24dp"
                     android:gravity="center"
                     android:text="Mo"/>

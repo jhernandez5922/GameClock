@@ -1,19 +1,19 @@
-package jhernandez.gameclock;
+package jhernandez.gameclock.alarm.creation;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TimePicker;
 
-public class TimePreference extends Preference implements TimePicker.OnTimeChangedListener {
+import jhernandez.gameclock.R;
+
+public class TimePreference extends Preference implements TimePicker.OnClickListener {
 
 
-    private static final String TAG = AlarmSettings.class.getSimpleName();
+    private static final String TAG = EditAlarm.class.getSimpleName();
 
     private int lastHour=0; //persisting hour picked
     private int lastMinute=0; //persisting minute picked
@@ -38,20 +38,26 @@ public class TimePreference extends Preference implements TimePicker.OnTimeChang
         super.onCreateView(parent);
         LayoutInflater li = (LayoutInflater)getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (timePicker != null) {
+            lastHour = timePicker.getCurrentHour();
+            lastMinute = timePicker.getCurrentMinute();
+        }
         View v = li.inflate(R.layout.timepicker_layout, parent, false);
-        //TODO Remove dependency on R.id.timePicker, possible add in as input argument
+        //TODO Remove dependency on R.id.timePicker, possible add in as input
         timePicker = (TimePicker) v.findViewById(R.id.timePicker);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-        lastHour = prefs.getInt("lastHour", 12);
-        lastMinute = prefs.getInt("lastMinute", 0);
         timePicker.setCurrentHour(lastHour);
         timePicker.setCurrentMinute(lastMinute);
         return v;
     }
 
     @Override
-    public void onTimeChanged(TimePicker view, int hourOfDay, int minute) {
-        lastHour = hourOfDay;
-        lastMinute = minute;
+    public void onClick(View v) {
+        lastHour = timePicker.getCurrentHour();
+        lastMinute = timePicker.getCurrentMinute();
+    }
+
+    public TimePicker getTimePicker() {
+
+        return timePicker;
     }
 }

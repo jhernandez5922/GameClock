@@ -1,4 +1,4 @@
-package jhernandez.gameclock;
+package jhernandez.gameclock.alarm;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -11,14 +11,36 @@ import jhernandez.gameclock.sqlite.AlarmContract.AlarmEntry;
 import jhernandez.gameclock.sqlite.AlarmDbHelper;
 
 /**
+ *  This class maintains the necessary information for an alarm
+ *
+ *  The class implements Parcelable to be packaged into intents and sent
+ *  between activities
+ *  See android.os.Parcelable for more
+ *
+ *
+ *
  * Created by Jason on 11/6/2015.
  */
 public class Alarm implements Parcelable {
 
+    /** CLASS MEMBERS
+     *  String name -> The name of the alarm, to help identify for users
+     *  long time -> The next time the alarm will be triggered
+     *  boolean week [] -> An array to indicate whether or not a weekday will trigger an alarm
+     *  int ID -> the unique ID given to an alarm when created in the database
+     *  boolean active -> To indicate if the alarm will trigger at the next specified time
+     *  ContentValues contentValues -> Formats all the previous class members to allow them to
+     *                                  be entered into the database.
+     *                                  See android.content.ContentValues for more
+     *  String weekName[] -> A list of strings to quickly access the column indices of the database
+     *                      to quickly map them. See jhernandez.gameclock.sqlite.AlarmContract for more
+     */
     private String name;
     private long time;
     private boolean week [];
     private int ID;
+    private boolean active;
+    ContentValues contentValues;
     public static final String weekName [] = {
             AlarmEntry.COLUMN_SUN,
             AlarmEntry.COLUMN_MON,
@@ -28,35 +50,37 @@ public class Alarm implements Parcelable {
             AlarmEntry.COLUMN_FRI,
             AlarmEntry.COLUMN_SAT
     };
-    ContentValues contentValues;
-
+/** CONSTRUCTORS **/
     //Default constructor
     public Alarm() {
-        name = "";
-        time = 0;
-        week = new boolean[7];
-        contentValues = new ContentValues();
-        ID = -1;
+        this.name = "";
+        this.time = 0;
+        this.week = new boolean[7];
+        this.contentValues = new ContentValues();
+        this.ID = -1;
+        this.active = true;
         putToCV();
     }
 
     //Takes inputs and maps to Alarm class
-    public Alarm(String name, long time, boolean [] week, int ID) {
+    public Alarm(String name, long time, boolean [] week, int ID, boolean active) {
         this.name = name;
         this.time = time;
         if (!this.setEntireWeek(week));
             this.week = new boolean[7];
-        contentValues = new ContentValues();
+        this.contentValues = new ContentValues();
         this.ID = ID;
+        this.active = active;
         putToCV();
     }
 
     //Puts Parcelable values into an Alarm
     protected Alarm(Parcel in) {
-        name = in.readString();
-        time = in.readLong();
-        week = in.createBooleanArray();
-        contentValues = ContentValues.CREATOR.createFromParcel(in);
+        this.name = in.readString();
+        this.time = in.readLong();
+        this.week = in.createBooleanArray();
+        this.active = in.readInt() == 1;
+        this.contentValues = ContentValues.CREATOR.createFromParcel(in);
     }
 
     //Puts Database values into an Alarm
@@ -65,27 +89,30 @@ public class Alarm implements Parcelable {
         this.time = AlarmDbHelper.getAlarmTime(cursor);
         this.week = AlarmDbHelper.getAlarmWeek(cursor);
         this.ID = AlarmDbHelper.getAlarmID(cursor);
-        contentValues = new ContentValues();
+        this.active = AlarmDbHelper.getAlarmActive(cursor);
+        this.contentValues = new ContentValues();
         putToCV();
     }
 
-    //Getters
+/** GETTERS **/
     public String getAlarmName() { return name; }
     public long getAlarmTime() {return time;}
     public boolean [] getWeek() {return week;}
     public int getID() {return ID;}
+    public boolean isActive() {return active;}
 
-    //Validators
-    public boolean isActive() {return true;}
-    public boolean invalidValues() {
-        if (this.name.equals(""))
-            return true;
-        if (this.time <= 0)
-            return true;
-        if (week.length != 7)
-            return true;
-        else
+/** VALIDATORS **/
+    public boolean isValid() {
+        if (!this.name.equals(""))
             return false;
+        if (this.time > 0)
+            return false;
+        if (week.length == 7)
+            return false;
+        else if (this.ID <= 0)
+            return false;
+        else
+            return active;
     }
     public boolean readyToInsert() {
         if (contentValues == null)
@@ -94,6 +121,8 @@ public class Alarm implements Parcelable {
             return false;
         if (!contentValues.containsKey(AlarmEntry.COLUMN_TIME))
             return false;
+        if (!contentValues.containsKey(AlarmEntry.COLUMN_ACTIVE))
+            return false;
         for (int i = 0; i < 7; i++) {
             if (!contentValues.containsKey(weekName[i]))
                 return false;
@@ -101,14 +130,14 @@ public class Alarm implements Parcelable {
         return true;
     }
 
-    //Setters
+/** SETTERS **/
+    public void setActive(boolean active) {
+        this.active = active;
+        putActiveToCV();
+    }
     public void setAlarmName(String name) {this.name = name; putNameToCV();}
     public void setAlarmTime(long time) {this.time = time; putTimeToCV();}
-    public void setWeekDay (int day, boolean active) {this.week[day] = active; putDayToCV(day, this.week[day] ? 1 : 0);}
-    public void advanceDays(long days) {
-        days = TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS);
-        this.time += days;
-    }
+    public void setWeekDay (int day, boolean isActiveDay) {this.week[day] = isActiveDay; putDayToCV(day, this.week[day] ? 1 : 0);}
     public void setID(String id) {
         this.ID = Integer.parseInt(id);
     }
@@ -121,17 +150,29 @@ public class Alarm implements Parcelable {
         return false;
     }
 
-    //ContentValue putters
+/** MISC **/
+    //Given N days, update the alarm trigger time forward N days.
+    public void advanceDays(long days) {
+        days = TimeUnit.MILLISECONDS.convert(days, TimeUnit.DAYS);
+        this.time += days;
+    }
+
+
+/** CONTENT VALUE UPDATERS **/
     private void putToCV() {
         putNameToCV();
         putTimeToCV();
         putWeekToCV();
+        putActiveToCV();
     }
     private void putNameToCV() {
         contentValues.put(AlarmEntry.COLUMN_NAME, name);
     }
     private void putTimeToCV() {
         contentValues.put(AlarmEntry.COLUMN_TIME, time);
+    }
+    private void putActiveToCV() {
+        contentValues.put(AlarmEntry.COLUMN_ACTIVE, active);
     }
     private void putWeekToCV() {
         for (int i  = 0; i < 7; i++) {
@@ -143,7 +184,7 @@ public class Alarm implements Parcelable {
     }
 
 
-    //Parcelable Functions
+/** PARCELABLE METHODS **/
     @Override
     public int describeContents() {
         return 0;
@@ -155,6 +196,7 @@ public class Alarm implements Parcelable {
         dest.writeString(name);
         dest.writeLong(time);
         dest.writeBooleanArray(week);
+        dest.writeInt(active ? 1 : 0);
         contentValues.writeToParcel(dest, 0);
     }
     public static final Creator<Alarm> CREATOR = new Creator<Alarm>() {

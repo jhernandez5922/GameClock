@@ -2,14 +2,9 @@
 
 
 
-    <jhernandez.gameclock.TimePreference
+    <jhernandez.gameclock.alarm.creation.TimePreference
         android:name="Pick a Time"
         android:key="@string/time_picker" />
-
-    <CheckBoxPreference
-        android:key="active"
-        android:title="@string/alarm_active"
-        android:defaultValue="true" />
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
@@ -23,8 +18,6 @@
         android:singleLine="true"
         android:maxLines="1" />
 
-
-
     <MultiSelectListPreference
         android:name="Repeating"
         android:id="@+id/repeating_alarm"
@@ -33,6 +26,7 @@
         android:entries="@array/days_of_week"
         android:entryValues="@array/days_entries"
         android:defaultValue="@array/days_of_week"/>
+
     <!--<CheckBoxPreference-->
     <!--android:name="time_format"-->
     <!--android:title="Time format"-->

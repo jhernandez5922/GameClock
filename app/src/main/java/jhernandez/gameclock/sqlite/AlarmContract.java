@@ -31,6 +31,7 @@ public class AlarmContract {
 
         public static final String COLUMN_TIME = "time";
 
+        public static final String COLUMN_ACTIVE = "active";
 
         public static final String COLUMN_SUN = "sunday";
         public static final String COLUMN_MON = "monday";

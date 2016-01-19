@@ -1,4 +1,4 @@
-package jhernandez.gameclock.game;
+package jhernandez.gameclock.game.objects;
 
 import android.graphics.Rect;
 

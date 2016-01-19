@@ -1,4 +1,4 @@
-package jhernandez.gameclock;
+package jhernandez.gameclock.alarm;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,12 +20,13 @@ import com.daimajia.swipe.SwipeLayout;
 
 import java.text.SimpleDateFormat;
 
+import jhernandez.gameclock.R;
 import jhernandez.gameclock.sqlite.AlarmContract;
 
 /**
  * Created by Jason on 11/3/2015.
  */
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
+public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> {
 
     CursorAdapter mCursorAdapter;
     private Context mContext;
@@ -32,19 +35,25 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener {
         // each data item is just a string in this case
         protected TextView titleText;
         protected CardView card;
-        SwipeLayout swipeLayout;
-        ImageView buttonDelete;
+        protected SwipeLayout swipeLayout;
+        protected View leftview;
+        protected ImageView buttonDelete;
+        protected CheckBox active;
+        Alarm alarm;
 
-        public ViewHolder(View v, final Cursor cursor) {
+        public ViewHolder(View v) {
             super(v);
             titleText = (TextView) v.findViewById(R.id.card_title);
             card = (CardView) v;
+            active = (CheckBox) v.findViewById(R.id.active);
             swipeLayout = (SwipeLayout) v.findViewById(R.id.swipe);
             buttonDelete = (ImageView) v.findViewById(R.id.delete);
+            leftview = v.findViewById(R.id.bottom_wrapper_2);
+            active.setChecked(true);
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -53,9 +62,27 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             });
         }
 
+        public void updateActive() {
+            if (alarm != null)
+                active.setChecked(alarm.isActive());
+            else {
+                active.setChecked(false);
+            }
+        }
+
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            alarm.setActive(isChecked);
+            if (isChecked)
+                AlarmReceiver.setAlarm(buttonView.getContext().getApplicationContext(), alarm);
+            else
+                AlarmReceiver.deactivateAlarm(buttonView.getContext().getApplicationContext(), alarm);
+
+        }
+
     }
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyAdapter(Context context, Cursor cursor) {
+    public AlarmAdapter(Context context, Cursor cursor) {
         mContext = context;
         if (cursor == null) {
             cursor = context.getContentResolver().query(
@@ -89,43 +116,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     }
     // Create new views (invoked by the layout manager)
     @Override
-    public MyAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
+    public AlarmAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
                                                    int viewType) {
-        final View v = mCursorAdapter.newView(mContext, mCursorAdapter.getCursor(), parent);
-        final MyAdapter.ViewHolder holder = new ViewHolder(v, mCursorAdapter.getCursor());
-//        v.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View view) {
-//                AlertDialog.Builder adb = new AlertDialog.Builder(
-//                        v.getContext());
-//                adb.setTitle("Remove this alarm?");
-//                adb.setPositiveButton("Yes",
-//                        new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                removeItem(holder.getAdapterPosition());
-//                            }
-//                        });
-//                adb.setNegativeButton("NO",
-//                        new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                dialog.dismiss();
-//                            }
-//                        });
-//                adb.show();
-//
-//                return false;
-//            }
-//        });
-//        v.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent editAlarm = new Intent(v.getContext(), AlarmSettings.class);
-//                v.getContext().startActivity(editAlarm);
-//            }
-//        });
-        return holder;
+        View v = mCursorAdapter.newView(mContext, mCursorAdapter.getCursor(), parent);
+        return new ViewHolder(v);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -136,6 +130,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         Cursor c = mCursorAdapter.getCursor();
         c.moveToPosition(holder.getAdapterPosition());
         holder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
+        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Left, holder.leftview);
         holder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
             @Override
             public void onOpen(SwipeLayout layout) {
@@ -157,8 +152,12 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
                 Toast.makeText(view.getContext(), "Deleted " + holder.titleText.getText().toString() + "!", Toast.LENGTH_SHORT).show();
             }
         });
+        if (holder.alarm == null) {
+            holder.alarm = new Alarm(c);
+        }
+        holder.active.setOnCheckedChangeListener(holder);
+        holder.updateActive();
         mCursorAdapter.bindView(holder.card, mContext, c);
-
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -198,7 +197,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
             TextView tv = (TextView) v.findViewById(weekViews[i]);
             tv.setTextColor(
                     week[i] ? ContextCompat.getColor(v.getContext(), R.color.color_primary)
-                            : ContextCompat.getColor(v.getContext(), R.color.color_verify_green)
+                            : ContextCompat.getColor(v.getContext(), R.color.color_primary_dark)
             );
         }
     }

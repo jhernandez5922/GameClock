@@ -1,7 +1,9 @@
-package jhernandez.gameclock.game;
+package jhernandez.gameclock.game.objects;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+
+import jhernandez.gameclock.game.GamePanel;
 
 /**
  * Created by Jason on 10/12/2015.

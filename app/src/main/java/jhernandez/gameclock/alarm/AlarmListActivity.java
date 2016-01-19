@@ -1,16 +1,22 @@
-package jhernandez.gameclock;
+package jhernandez.gameclock.alarm;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class AlarmList extends AppCompatActivity {
+import jhernandez.gameclock.R;
+
+public class AlarmListActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_list);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
     }
 
 

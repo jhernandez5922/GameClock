@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 /**
  * Created by Jason on 1/11/2016.
  */
-public class GameAnimation {
+public class GameAnimator {
 
     private Bitmap[] frames;
     private int currentFrame;

@@ -1,29 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:layout_width="match_parent"
+<RelativeLayout
+    android:layout_width="100dp"
     android:layout_height="match_parent"
-    android:orientation="horizontal"
-    android:background="@color/gray_background"
-    android:weightSum="3"
+    android:background="@color/color_primary_dark"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <TextView
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:id="@+id/txt_delete"
-        android:gravity="center_vertical"
-        android:text="deleted"
-        android:clickable="false"
-        android:layout_weight="2"
-        android:hapticFeedbackEnabled="true"
-        android:textColor="#FF5534"/>
+        <ImageView
+            android:id="@+id/delete"
+            android:contentDescription="Delete"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:background="@color/color_primary_dark"
+            android:src="@drawable/trash_recyclebin_empty_closed"
+            />
 
-    <ImageView
-        android:id="@+id/delete"
-        android:contentDescription="Delete"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:background="#FF5534"
-        android:src="@android:drawable/ic_menu_delete" />
-</LinearLayout>
+    </RelativeLayout>
