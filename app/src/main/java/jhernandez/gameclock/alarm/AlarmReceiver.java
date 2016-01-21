@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import jhernandez.gameclock.R;
 
@@ -72,28 +73,40 @@ public class AlarmReceiver extends BroadcastReceiver {
      * @param week: list of each day of the week, and whether or not they are active
      * @return returns the valid day, or -1 if anything goes wrong
      */
-    public static int getNearestDay (Calendar setTime, boolean [] week) {
-        Calendar currentTime = Calendar.getInstance();
+    public static Calendar getNearestDate(int hour, int minute, boolean[] week) {
+        Calendar currentTime = Calendar.getInstance(), setTime = Calendar.getInstance();
+        setTime.set(Calendar.HOUR_OF_DAY, hour);
+        setTime.set(Calendar.MINUTE, minute);
         int day = setTime.get(Calendar.DAY_OF_WEEK);
+        int increase;
         if (currentTime.after(setTime))
             day++;
-        if (day > Calendar.SATURDAY)
-            day = 1;
-        for (int i = 0; i < 7; i++) {
+        for (increase = 0; increase < 7; increase++) {
+            if (day == 8) {
+                day = 1;
+            }
             if (week[day - 1]) {
-                if(day == setTime.get(Calendar.DAY_OF_WEEK) && i + 1 == 7)
-                    return 8;
-                return day;
+                break;
             }
-            else {
-                if (day == Calendar.SATURDAY) {
-                    day = Calendar.SUNDAY;
-                }
-                else
-                    day++;
-            }
+            day++;
         }
-        return -1;
+        if (increase == 7 && !week[day - 1]) {
+            return null;
+        }
+        increase += setTime.get(Calendar.DAY_OF_YEAR);
+        setTime.set(Calendar.DAY_OF_WEEK, day);
+        if (!setTime.after(currentTime)){
+            GregorianCalendar cal = new GregorianCalendar();
+            if (increase >= 365) {
+                if (cal.isLeapYear(setTime.get(Calendar.YEAR)) && increase <= 366)
+                    setTime.set(Calendar.DAY_OF_YEAR, 366 - increase);
+                else
+                    setTime.set(Calendar.DAY_OF_YEAR, 365 - increase);
+            } else
+                setTime.set(Calendar.DAY_OF_YEAR, increase);
+        }
+
+        return setTime;
     }
 
     /**
@@ -128,12 +141,9 @@ public class AlarmReceiver extends BroadcastReceiver {
             //Get next time and update alarm
             Calendar alarmSetTime = Calendar.getInstance();
             alarmSetTime.setTimeInMillis(alarm.getAlarmTime());
-            int day = AlarmReceiver.getNearestDay(alarmSetTime, alarm.getWeek());
-            if (day == -1) {
+            alarmSetTime = AlarmReceiver.getNearestDate(alarmSetTime.get(Calendar.HOUR_OF_DAY), alarmSetTime.get(Calendar.MINUTE), alarm.getWeek());
+            if (alarmSetTime == null)
                 return;
-            }
-            alarm.advanceDays(day - alarmSetTime.get(Calendar.DAY_OF_WEEK));
-            alarmSetTime.set(Calendar.DAY_OF_WEEK, day);
             alarm.setAlarmTime(alarmSetTime.getTimeInMillis());
 
 
@@ -149,8 +159,6 @@ public class AlarmReceiver extends BroadcastReceiver {
                 alarmMgr.setExact(AlarmManager.RTC_WAKEUP, alarmSetTime.getTimeInMillis(), alarmIntent);
             else
                 alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmSetTime.getTimeInMillis(), alarmIntent);
-
-
 
             //Notify set
             SimpleDateFormat sdf = new SimpleDateFormat("M/d/y h:mm a");

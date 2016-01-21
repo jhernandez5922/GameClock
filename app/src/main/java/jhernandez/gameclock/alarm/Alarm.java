@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,6 +36,7 @@ public class Alarm implements Parcelable {
      *  String weekName[] -> A list of strings to quickly access the column indices of the database
      *                      to quickly map them. See jhernandez.gameclock.sqlite.AlarmContract for more
      */
+    private static final String TAG = "GameClock Alarm Test";
     private String name;
     private long time;
     private boolean week [];
@@ -98,21 +100,34 @@ public class Alarm implements Parcelable {
     public String getAlarmName() { return name; }
     public long getAlarmTime() {return time;}
     public boolean [] getWeek() {return week;}
+    public boolean getWeekDay(int day) {return week[day];}
     public int getID() {return ID;}
     public boolean isActive() {return active;}
 
 /** VALIDATORS **/
     public boolean isValid() {
-        if (!this.name.equals(""))
+        if (this.name.equals("")) {
+            Log.e(TAG, "ALARM NAME INVALID");
             return false;
-        if (this.time > 0)
+        }
+        if (this.time < 0) {
+            Log.e(TAG, "ALARM TIME INVALID");
             return false;
-        if (week.length == 7)
+        }
+        if (week.length != 7) {
+            Log.e(TAG, "ALARM WEEK SETUP INVALID");
             return false;
-        else if (this.ID <= 0)
+        }
+        else if (this.ID < 0) {
+            Log.e(TAG, "ALARM ID INVALID");
             return false;
-        else
+        }
+        else {
+            if (!active) {
+                Log.v(TAG, "ALARM NOT ACTIVE");
+            }
             return active;
+        }
     }
     public boolean readyToInsert() {
         if (contentValues == null)

@@ -1,6 +1,7 @@
 package jhernandez.gameclock.alarm.creation;
 
 import android.content.Context;
+import android.os.Build;
 import android.preference.Preference;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -59,5 +60,40 @@ public class TimePreference extends Preference implements TimePicker.OnClickList
     public TimePicker getTimePicker() {
 
         return timePicker;
+    }
+
+    public int getHour() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            lastHour = timePicker.getCurrentHour();
+        } else {
+            lastHour = timePicker.getHour();
+        }
+
+        return lastHour;
+    }
+
+    public void setHour(int hour) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            timePicker.setCurrentHour(hour);
+        } else {
+            timePicker.setHour(hour);
+        }
+    }
+    @SuppressWarnings("depcrated")
+    public int getMinute() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            timePicker.getCurrentMinute();
+        } else {
+            lastMinute = timePicker.getMinute();
+        }
+        return lastMinute;
+    }
+
+    public void setMinute(int minute) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            timePicker.setCurrentHour(minute);
+        } else {
+            timePicker.setHour(minute);
+        }
     }
 }

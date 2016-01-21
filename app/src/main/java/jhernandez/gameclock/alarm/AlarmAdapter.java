@@ -1,6 +1,7 @@
 package jhernandez.gameclock.alarm;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
@@ -21,6 +22,7 @@ import com.daimajia.swipe.SwipeLayout;
 import java.text.SimpleDateFormat;
 
 import jhernandez.gameclock.R;
+import jhernandez.gameclock.alarm.creation.EditAlarm;
 import jhernandez.gameclock.sqlite.AlarmContract;
 
 /**
@@ -40,8 +42,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         protected TextView titleText;
         protected CardView card;
         protected SwipeLayout swipeLayout;
-        protected View leftview;
-        protected ImageView buttonDelete;
+        protected View editButton;
+        protected ImageView deleteButton;
         protected CheckBox active;
         Alarm alarm;
 
@@ -51,8 +53,8 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
             card = (CardView) v;
             active = (CheckBox) v.findViewById(R.id.active);
             swipeLayout = (SwipeLayout) v.findViewById(R.id.swipe);
-            buttonDelete = (ImageView) v.findViewById(R.id.delete);
-            leftview = v.findViewById(R.id.bottom_wrapper_2);
+            deleteButton = (ImageView) v.findViewById(R.id.delete);
+            editButton = v.findViewById(R.id.bottom_wrapper_2);
             active.setChecked(true);
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -130,26 +132,32 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         Cursor c = mCursorAdapter.getCursor();
         c.moveToPosition(holder.getAdapterPosition());
         holder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
-        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Left, holder.leftview);
+        holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Left, holder.editButton);
         holder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
             @Override
             public void onOpen(SwipeLayout layout) {
                 //YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
             }
         });
-        holder.swipeLayout.setOnDoubleClickListener(new SwipeLayout.DoubleClickListener() {
-            @Override
-            public void onDoubleClick(SwipeLayout layout, boolean surface) {
-                Toast.makeText(mContext, "DoubleClick", Toast.LENGTH_SHORT).show();
-            }
-        });
-        holder.buttonDelete.setOnClickListener(new View.OnClickListener() {
+        holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 removeItem(position);
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, mCursorAdapter.getCount());
                 Toast.makeText(view.getContext(), "Deleted " + holder.titleText.getText().toString() + "!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        holder.editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Cursor c = mCursorAdapter.getCursor();
+                c.moveToPosition(position);
+                Alarm alarm = new Alarm(c);
+                Intent intent = new Intent(mContext, EditAlarm.class);
+                intent.putExtra("alarm", alarm);
+                mContext.startActivity(intent);
+                mCursorAdapter.notifyDataSetChanged();
             }
         });
         if (holder.alarm == null) {
@@ -190,15 +198,28 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                 R.id.friday_button,
                 R.id.saturday_button
         };
-        boolean [] week = new boolean[7];
+        final Alarm current = new Alarm(cursor);
         for (int i = 0; i < 7; i++) {
-            int temp = cursor.getInt(cursor.getColumnIndex(Alarm.weekName[i]));
-            week[i] = temp == 1;
             TextView tv = (TextView) v.findViewById(weekViews[i]);
             tv.setTextColor(
-                    week[i] ? ContextCompat.getColor(v.getContext(), R.color.color_primary)
+                    current.getWeekDay(i) ? ContextCompat.getColor(v.getContext(), R.color.color_primary)
                             : ContextCompat.getColor(v.getContext(), R.color.color_primary_dark)
             );
+            final int index = i;
+            tv.setOnClickListener(new TextView.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    current.setWeekDay(index, !current.getWeekDay(index));
+                    boolean day = current.getWeekDay(index);
+                    current.setWeekDay(index, day);
+                    ((TextView) v).setTextColor(
+                            day ? ContextCompat.getColor(v.getContext(), R.color.color_primary)
+                                    : ContextCompat.getColor(v.getContext(), R.color.color_primary_dark)
+                    );
+                    AlarmReceiver.setAlarm(mContext.getApplicationContext(), current);
+                    mContext.getContentResolver().update(AlarmContract.AlarmEntry.CONTENT_URI, current.contentValues,"_id=" + current.getID(), null );
+                }
+            });
         }
     }
 }

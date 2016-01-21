@@ -3,7 +3,6 @@ package jhernandez.gameclock.alarm.creation;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -27,7 +26,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TimePicker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,14 +60,11 @@ public class EditAlarm extends AppCompatPreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        alarm = getIntent().getParcelableExtra("alarm");
-        if (alarm == null) {
-            alarm = new Alarm();
-        }
-        setupActionBar();
 
+        setupActionBar();
+        GeneralPreferenceFragment settingsFrag = new GeneralPreferenceFragment();
         getFragmentManager().beginTransaction().replace(android.R.id.content,
-                new GeneralPreferenceFragment(), FRAG_TAG).commit();
+                settingsFrag, FRAG_TAG).commit();
     }
 
     /**
@@ -205,10 +200,6 @@ public class EditAlarm extends AppCompatPreferenceActivity {
                 String days = getDays(stringValue);
                 preference.setSummary(days);
 //                }
-            } else if (preference instanceof TimePreference) {
-                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
-                TimePreference timePicker = (TimePreference) preference;
-
             } else {
                 // For all other preferences, set the summary to the value's
                 // simple string representation.
@@ -259,6 +250,7 @@ public class EditAlarm extends AppCompatPreferenceActivity {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class GeneralPreferenceFragment extends PreferenceFragment {
 
+        private Alarm alarm;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -284,17 +276,21 @@ public class EditAlarm extends AppCompatPreferenceActivity {
             return v;
         }
 
+        @Override
+        public void onStart() {
+            super.onStart();
+            findPreference("repeating").setSummary("");
+        }
+
+
         public Alarm finalizeAlarm() {
-            Alarm alarm = new Alarm();
-            TimePicker timePicker = ((TimePreference) findPreference("tpKey")).getTimePicker();
-            Calendar time = Calendar.getInstance();
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                time.set(Calendar.HOUR_OF_DAY, timePicker.getCurrentHour());
-                time.set(Calendar.MINUTE, timePicker.getCurrentMinute());
-            } else {
-                time.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
-                time.set(Calendar.MINUTE, timePicker.getMinute());
+            if (alarm == null) {
+                alarm = new Alarm();
             }
+            TimePreference timePicker = ((TimePreference) findPreference("tpKey"));
+            Calendar time = Calendar.getInstance();
+            time.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+            time.set(Calendar.MINUTE, timePicker.getMinute());
             time.set(Calendar.SECOND, 0);
             time.set(Calendar.MILLISECOND, 0);
             alarm.setAlarmTime(time.getTimeInMillis());
