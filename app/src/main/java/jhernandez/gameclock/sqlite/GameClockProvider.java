@@ -121,7 +121,6 @@ public class GameClockProvider  extends ContentProvider{
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         int rowsDeleted;
-
         if (selection == null)
             selection = "100";
         switch (match) {
@@ -131,7 +130,6 @@ public class GameClockProvider  extends ContentProvider{
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-
         if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }

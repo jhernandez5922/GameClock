@@ -18,12 +18,14 @@ public class TimePreference extends Preference implements TimePicker.OnClickList
 
     private int lastHour=0; //persisting hour picked
     private int lastMinute=0; //persisting minute picked
+    private LayoutInflater mInflater;
    // private int idx;
     private TimePicker timePicker = null;
 
     public TimePreference(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-
+        setLayoutResource(R.layout.timepicker_layout);
+        mInflater = LayoutInflater.from(context);
     }
 
     public TimePreference(Context context, AttributeSet attrs) {
@@ -37,18 +39,20 @@ public class TimePreference extends Preference implements TimePicker.OnClickList
     @Override
     protected View onCreateView(ViewGroup parent) {
         super.onCreateView(parent);
-        LayoutInflater li = (LayoutInflater)getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        if (timePicker != null) {
-            lastHour = timePicker.getCurrentHour();
-            lastMinute = timePicker.getCurrentMinute();
-        }
-        View v = li.inflate(R.layout.timepicker_layout, parent, false);
-        //TODO Remove dependency on R.id.timePicker, possible add in as input
+        Context context = parent.getContext();
+        mInflater = LayoutInflater.from(context);
+        View v = mInflater.inflate(R.layout.timepicker_layout, parent, false);
         timePicker = (TimePicker) v.findViewById(R.id.timePicker);
+        return v;
+    }
+
+    @Override
+    protected void onBindView(View view)
+    {
+        super.onBindView(view);
+        timePicker = (TimePicker) view.findViewById(R.id.timePicker);
         timePicker.setCurrentHour(lastHour);
         timePicker.setCurrentMinute(lastMinute);
-        return v;
     }
 
     @Override

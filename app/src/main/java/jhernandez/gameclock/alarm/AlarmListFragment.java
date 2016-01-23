@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -68,7 +67,7 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
         newAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(getContext(), EditAlarm.class), 1);
+                getActivity().startActivityForResult(new Intent(getContext(), EditAlarm.class), 1);
             }
         });
         newAlarm.setOnLongClickListener(new View.OnLongClickListener() {
@@ -79,22 +78,6 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
             }
         });
         return v;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == FragmentActivity.RESULT_OK) {
-
-            //Parse name from extras from activity executed
-            Alarm alarm = data.getParcelableExtra("alarm");
-            if (alarm.readyToInsert()) {
-                Uri result = getContext().getContentResolver().insert(AlarmContract.AlarmEntry.CONTENT_URI, alarm.contentValues);
-                alarm.setID(result.getLastPathSegment());
-                //Signal Alarm Manager to set an alarm
-                AlarmReceiver.setAlarm(getActivity().getApplicationContext(), alarm);
-            }
-
-        }
     }
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -145,6 +128,11 @@ public class AlarmListFragment extends Fragment implements LoaderManager.LoaderC
             mRecyclerView.setVisibility(View.VISIBLE);
             emptyView.setVisibility(View.GONE);
         }
+    }
+
+    public void alertAdapter() {
+        mAdapter.notifyUpdates();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override

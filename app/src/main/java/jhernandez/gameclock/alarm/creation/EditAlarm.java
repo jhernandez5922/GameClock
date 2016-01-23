@@ -1,40 +1,33 @@
 package jhernandez.gameclock.alarm.creation;
 
-import android.annotation.TargetApi;
-import android.content.Context;
+import android.app.Fragment;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.preference.ListPreference;
-import android.preference.MultiSelectListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.ActionBar;
-import android.text.TextUtils;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
+import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.TextView;
+
+import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.Set;
 
 import jhernandez.gameclock.R;
 import jhernandez.gameclock.alarm.Alarm;
@@ -51,35 +44,34 @@ import jhernandez.gameclock.alarm.Alarm;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class EditAlarm extends AppCompatPreferenceActivity {
+public class EditAlarm extends AppCompatActivity {
 
     Alarm alarm;
 
     private final static String FRAG_TAG = "Alarm Preference";
-
+    private final static int [] WEEK_VIEWS = {
+            R.id.sunday_button,
+            R.id.monday_button,
+            R.id.tuesday_button,
+            R.id.wednesday_button,
+            R.id.thursday_button,
+            R.id.friday_button,
+            R.id.saturday_button
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setupActionBar();
+        setContentView(R.layout.preference_activity_toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        Bundle bundle = new Bundle();
+        Alarm alarm = getIntent().getParcelableExtra("alarm");
+        bundle.putParcelable("alarm", alarm);
         GeneralPreferenceFragment settingsFrag = new GeneralPreferenceFragment();
-        getFragmentManager().beginTransaction().replace(android.R.id.content,
+        settingsFrag.setArguments(bundle);
+        getFragmentManager().beginTransaction().replace(R.id.content_frame,
                 settingsFrag, FRAG_TAG).commit();
-    }
-
-    /**
-     * Set up the {@link android.app.ActionBar}, if the API is available.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    private void setupActionBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            // Show the Up button in the action bar.
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null) {
-                // Show the Up button in the action bar.
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
-        }
     }
 
     @Override
@@ -107,17 +99,12 @@ public class EditAlarm extends AppCompatPreferenceActivity {
         }
         if (id == R.id.save_alarm) {
             //boolean checked = ((CheckBoxPreference) findPreference("active")).isChecked();
-
             //Add in whether the or not the alarm is active
             //TODO Replace with delete and move active to above screen
             //intent.putExtra("active"+idx, checked);
-
             //Format the time from the timePicker and
             Intent intent = new Intent();
-
             alarm = ((GeneralPreferenceFragment) getFragmentManager().findFragmentByTag(FRAG_TAG)).finalizeAlarm();
-
-
             //Add to Intent
             intent.putExtra("alarm", alarm);
             //Let menu activity know results from intent are okay
@@ -130,181 +117,106 @@ public class EditAlarm extends AppCompatPreferenceActivity {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean onIsMultiPane() {
-        return isXLargeTablet(this);
-    }
+    public static class GeneralPreferenceFragment extends Fragment implements TextView.OnClickListener, RadialTimePickerDialogFragment.OnTimeSetListener{
 
-    /**
-     * Helper method to determine if the device has an extra-large screen. For
-     * example, 10" tablets are extra-large.
-     */
-    private static boolean isXLargeTablet(Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-    }
+        Alarm alarm;
+        int hour, minute;
+        boolean [] week;
+        TextView timePicker;
+        EditText name;
 
-    protected boolean isValidFragment(String fragmentName) {
-        return fragmentName.equals(GeneralPreferenceFragment.class.getName());
-    }
-
-    /**
-     * A preference value change listener that updates the preference's summary
-     * to reflect its new value.
-     */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
-        @Override
-        public boolean onPreferenceChange(Preference preference, Object value) {
-            String stringValue = value.toString();
-
-            if (preference instanceof ListPreference) {
-                // For list preferences, look up the correct display value in
-                // the preference's 'entries' list.
-                ListPreference listPreference = (ListPreference) preference;
-                int index = listPreference.findIndexOfValue(stringValue);
-
-                // Set the summary to reflect the new value.
-                preference.setSummary(
-                        index >= 0
-                                ? listPreference.getEntries()[index]
-                                : null);
-
-            } else if (preference instanceof RingtonePreference) {
-                // For ringtone preferences, look up the correct display value
-                // using RingtoneManager.
-                if (TextUtils.isEmpty(stringValue)) {
-                    // Empty values correspond to 'silent' (no ringtone).
-                    preference.setSummary(R.string.pref_ringtone_silent);
-
-                } else {
-                    Ringtone ringtone = RingtoneManager.getRingtone(
-                            preference.getContext(), Uri.parse(stringValue));
-
-                    if (ringtone == null) {
-                        // Clear the summary if there was a lookup error.
-                        preference.setSummary(null);
-                    } else {
-                        // Set the summary to reflect the new ringtone display
-                        // name.
-                        String name = ringtone.getTitle(preference.getContext());
-                        preference.setSummary(name);
-                    }
-                }
-
-
-            } else if (preference instanceof MultiSelectListPreference) {
-                //For MultiSelectListPreference, parse days checked and set in summary
-                String days = getDays(stringValue);
-                preference.setSummary(days);
-//                }
-            } else {
-                // For all other preferences, set the summary to the value's
-                // simple string representation.
-                preference.setSummary(stringValue);
-            }
-            return true;
-        }
-    };
-
-    /**
-     * Binds a preference's summary to its value. More specifically, when the
-     * preference's value is changed, its summary (line of text below the
-     * preference title) is updated to reflect the value. The summary is also
-     * immediately updated upon calling this method. The exact display format is
-     * dependent on the type of preference.
-     *
-     * @see #sBindPreferenceSummaryToValueListener
-     */
-    private static void bindPreferenceSummaryToValue(Preference preference) {
-        // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
-        // Trigger the listener immediately with the preference's
-        // current value.
-        if (preference.getKey().equals("repeating")) {
-            Set<String> days = new HashSet<>(7);
-            days.add("Sun");
-            days.add("Mon");
-            days.add("Tue");
-            days.add("Wed");
-            days.add("Thr");
-            days.add("Fri");
-            days.add("Sat");
-            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    days.toString());
-        }
-        else {
-            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    PreferenceManager
-                            .getDefaultSharedPreferences(preference.getContext())
-                            .getString(preference.getKey(), ""));
-        }
-    }
-
-    /**
-     * This fragment shows general preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
-
-        private Alarm alarm;
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.alarm_pref_general);
-
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            //bindPreferenceSummaryToValue(findPreference("tpKey"));
-            bindPreferenceSummaryToValue(findPreference("repeating"));
-            bindPreferenceSummaryToValue(findPreference("name"));
+            alarm = this.getArguments().getParcelable("alarm");
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View v = super.onCreateView(inflater, container, savedInstanceState);
-            if (v != null) {
-                ListView lv = (ListView) v.findViewById(android.R.id.list);
-                lv.setPadding(0, 0, 0, 0);
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.fragment_edit_create_alarm, container, false);
+            name = (EditText) rootView.findViewById(R.id.edit_name);
+            timePicker = (TextView) rootView.findViewById(R.id.time);
+            TextView [] weekViews = new TextView[7];
+            for (int i = 0; i < 7; i++) {
+                weekViews[i] = (TextView) rootView.findViewById(WEEK_VIEWS[i]);
+                weekViews[i].setOnClickListener(this);
             }
-            return v;
+            if (alarm != null) {
+                //SET TIME
+                Calendar currentTime = Calendar.getInstance();
+                currentTime.setTimeInMillis(alarm.getAlarmTime());
+                hour = currentTime.get(Calendar.HOUR_OF_DAY);
+                minute = currentTime.get(Calendar.MINUTE);
+                timePicker.setText(hour + ":" + minute);
+                name.setText(alarm.getAlarmName());
+                week = alarm.getWeek();
+                for (int i = 0; i < week.length; i++) {
+                    weekViews[i].setTextColor(week[i] ? ContextCompat.getColor(rootView.getContext(), R.color.color_primary)
+                            : ContextCompat.getColor(rootView.getContext(), R.color.color_primary_dark));
+                }
+                //SET NAME
+            }
+            else {
+                alarm = new Alarm();
+                week = new boolean[7];
+                Arrays.fill(week, true);
+                alarm.setEntireWeek(week);
+                hour = 12;
+                minute = 0;
+            }
+            timePicker.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //TODO add settings for clock style
+                    Calendar time = Calendar.getInstance();
+                    time.setTimeInMillis(alarm.getAlarmTime());
+                    RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
+                            .setStartTime(time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE))
+                            .setThemeCustom(R.style.RadialTimePicker)
+                            .setOnTimeSetListener(GeneralPreferenceFragment.this);
+                    FragmentManager manager = ((FragmentActivity) getActivity()).getSupportFragmentManager();
+                    rtpd.show(manager, "tag");
+                }
+            });
+            return rootView;
         }
-
-        @Override
-        public void onStart() {
-            super.onStart();
-            findPreference("repeating").setSummary("");
-        }
-
 
         public Alarm finalizeAlarm() {
-            if (alarm == null) {
-                alarm = new Alarm();
+            Calendar newTime = Calendar.getInstance();
+            newTime.set(Calendar.HOUR_OF_DAY, hour);
+            newTime.set(Calendar.MINUTE, minute);
+            newTime.set(Calendar.SECOND, 0);
+            alarm.setEntireWeek(week);
+            alarm.setAlarmTime(newTime.getTimeInMillis());
+            if (name.getText().toString().equals("")) {
+                alarm.setAlarmName("Alarm");
             }
-            TimePreference timePicker = ((TimePreference) findPreference("tpKey"));
-            Calendar time = Calendar.getInstance();
-            time.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
-            time.set(Calendar.MINUTE, timePicker.getMinute());
-            time.set(Calendar.SECOND, 0);
-            time.set(Calendar.MILLISECOND, 0);
-            alarm.setAlarmTime(time.getTimeInMillis());
-
-
-            //----------- ADD NAME ----------------------------------------\\
-            alarm.setAlarmName(findPreference("name").getSummary().toString());
-
-            //----------- ADD WEEK ----------------------------------------\\
-            alarm.setEntireWeek(setWeek(findPreference("repeating").getSummary().toString()));
-
+            else
+                alarm.setAlarmName(name.getText().toString());
             alarm.setActive(true);
-
             return alarm;
+        }
+
+        @Override
+        public void onClick(View v) {
+            TextView tv = (TextView) v;
+            int index = getDay(tv.getText().toString());
+            if (index == -1) {
+                Log.e(FRAG_TAG, "INVALID DAY");
+                return;
+            }
+            alarm.setWeekDay(index, !alarm.getWeekDay(index));
+            tv.setTextColor(alarm.getWeekDay(index) ? ContextCompat.getColor(v.getContext(), R.color.color_primary)
+                    : ContextCompat.getColor(v.getContext(), R.color.color_primary_dark));
+        }
+
+        @Override
+        public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
+            this.hour = hourOfDay;
+            this.minute = minute;
+            //TODO add 12-Hour format
+            timePicker.setText(hourOfDay + ":" + minute);
         }
     }
 
@@ -312,21 +224,42 @@ public class EditAlarm extends AppCompatPreferenceActivity {
         List<String> selections = new ArrayList<>(Arrays.asList(value.replaceAll("[^A-Za-z]", " ").split(" ")));
         selections.removeAll(Arrays.asList(""));
         boolean [] week = new boolean[7];
-        if(selections.contains("Sun"))
+        if(selections.contains("Su"))
             week[0] = true;
-        if(selections.contains("Mon"))
+        if(selections.contains("Mo"))
             week[1] = true;
-        if (selections.contains("Tue"))
+        if (selections.contains("Tu"))
             week[2] = true;
-        if(selections.contains("Wed"))
+        if(selections.contains("We"))
             week[3] = true;
-        if (selections.contains("Thu"))
+        if (selections.contains("Th"))
             week[4] = true;
-        if(selections.contains("Fri"))
+        if(selections.contains("Fr"))
             week[5] = true;
-        if (selections.contains("Sat"))
+        if (selections.contains("Sa"))
             week[6] = true;
         return week;
+    }
+
+    private static int getDay(String value) {
+        switch(value) {
+            case "Su":
+                return 0;
+            case "Mo":
+                return 1;
+            case "Tu":
+                return 2;
+            case "We":
+                return 3;
+            case "Th":
+                return 4;
+            case "Fr":
+                return 5;
+            case "Sa":
+                return 6;
+            default:
+                return -1;
+        }
     }
 
     private static String dayOfWeek (int i) {
@@ -350,10 +283,14 @@ public class EditAlarm extends AppCompatPreferenceActivity {
         }
     }
     private static String getDays(String value) {
+        boolean[] week = setWeek(value);
+        return getStringFromWeek(week);
+    }
+
+
+    private static String getStringFromWeek(boolean [] week) {
         StringBuilder days = new StringBuilder();
-        boolean [] week = setWeek(value);
-        // intent.putExtra("days"+idx, week);
-        Queue<Integer> next = new LinkedList<>();
+        LinkedList<Integer> next = new LinkedList<>();
         int hours = 24;
         for (int i = 0; i < 7; i++) {
             if (!week[i]){
@@ -364,8 +301,8 @@ public class EditAlarm extends AppCompatPreferenceActivity {
             next.add(hours);
             hours = 24;
         }
-        //TODO FIX
-        // intent.putExtra("nextDay"+idx,(Serializable) next);
         return days.toString();
     }
+
+
 }

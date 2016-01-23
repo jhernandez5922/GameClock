@@ -5,6 +5,7 @@
         <item name="colorAccent">@color/color_accent</item>
         <item name="colorPrimary">@color/color_primary</item>
         <item name="colorPrimaryDark">@color/color_primary_dark</item>
+        <item name="android:textColorPrimary">@color/color_primary_dark</item>
     </style>
 
     <style name="SettingsTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar" >
@@ -28,7 +29,36 @@
         <item name="android:background">@android:drawable/bottom_bar</item>
     </style>
 
+    <style name="DTP">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">@dimen/margin</item>
+    </style>
+
+    <style name="DTP.Label">
+        <item name="android:textSize">@dimen/text</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="DTP.Button">
+        <item name="android:onClick">onClick</item>
+    </style>
+
     <!-- Backward-compatible version of ?android:attr/buttonBarButtonStyle -->
     <style name="ButtonBarButton" />
+
+    <style name="RadialTimePicker">
+        <item name="bpMainColor1">@color/color_primary</item>
+        <item name="bpMainColor2">@color/color_accent</item>
+        <item name="bpAccentColor">@color/color_primary_dark</item>
+        <item name="bpMainTextColor">@color/color_accent</item>
+        <item name="bpDoneTextColor">@color/color_primary_dark</item>
+        <item name="bpLineColor">@color/color_accent</item>
+        <item name="bpDoneBackgroundColor">@color/color_primary_dark</item>
+        <item name="bpSelectionAlpha">102</item>
+    </style>
+
+
 
 </resources>

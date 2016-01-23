@@ -69,7 +69,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     /**
      * This function returns the nearest valid day for the alarm to trigger next
-     * @param setTime: time in which the alarm is currently set to
+     * @param hour: hour in which the alarm is currently set to
+     * @param minute: minute in which the alarm is currently set to
      * @param week: list of each day of the week, and whether or not they are active
      * @return returns the valid day, or -1 if anything goes wrong
      */
@@ -79,9 +80,12 @@ public class AlarmReceiver extends BroadcastReceiver {
         setTime.set(Calendar.MINUTE, minute);
         int day = setTime.get(Calendar.DAY_OF_WEEK);
         int increase;
-        if (currentTime.after(setTime))
+        boolean flag = false;
+        if (currentTime.after(setTime)) {
             day++;
-        for (increase = 0; increase < 7; increase++) {
+            flag = true;
+        }
+        for (increase = flag ? 1 : 0; increase < 7; increase++) {
             if (day == 8) {
                 day = 1;
             }

@@ -18,10 +18,10 @@ public class AlarmReceiverTest extends AndroidTestCase {
         Arrays.fill(empty, false);
         Calendar startTime = Calendar.getInstance();
         startTime.setTimeInMillis(1453419000000L); // THU JAN 21 15:30
-        Calendar time = AlarmReceiver.getNearestDate(startTime, weekMon);
+        Calendar time = AlarmReceiver.getNearestDate(startTime.get(Calendar.HOUR_OF_DAY), startTime.get(Calendar.MINUTE), weekMon);
         startTime.setTimeInMillis(1453764600000L);
         assertEquals(time, startTime);
-        Calendar nullTime = AlarmReceiver.getNearestDate(startTime, empty);
+        Calendar nullTime = AlarmReceiver.getNearestDate(startTime.get(Calendar.HOUR_OF_DAY), startTime.get(Calendar.MINUTE), empty);
         assertEquals(nullTime, null);
     }
 }

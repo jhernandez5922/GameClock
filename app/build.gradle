@@ -33,4 +33,5 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:23.1.1'
     compile 'com.hudomju:swipe-to-dismiss-undo:1.0'
     compile 'com.daimajia.swipelayout:library:1.2.0@aar'
+    compile 'com.code-troopers.betterpickers:library:2.3.0'
 }

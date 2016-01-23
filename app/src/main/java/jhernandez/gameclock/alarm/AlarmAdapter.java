@@ -154,10 +154,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                 Cursor c = mCursorAdapter.getCursor();
                 c.moveToPosition(position);
                 Alarm alarm = new Alarm(c);
+                AlarmReceiver.deactivateAlarm(mContext.getApplicationContext(), alarm);
                 Intent intent = new Intent(mContext, EditAlarm.class);
                 intent.putExtra("alarm", alarm);
-                mContext.startActivity(intent);
-                mCursorAdapter.notifyDataSetChanged();
+                ((AlarmListActivity) mContext).startActivityForResult(intent, 1);
             }
         });
         if (holder.alarm == null) {
@@ -187,6 +187,12 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         mCursorAdapter.getCursor().moveToFirst();
 
     }
+
+    public void notifyUpdates() {
+        mCursorAdapter.notifyDataSetChanged();
+    }
+
+
     private void setUpWeek(View v, Cursor cursor) {
 
         int [] weekViews = new int[] {

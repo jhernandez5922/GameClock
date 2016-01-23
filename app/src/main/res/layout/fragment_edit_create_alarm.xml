@@ -1,0 +1,174 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white_background"
+    tools:context="jhernandez.gameclock.alarm.creation.EditCreateAlarm$PlaceholderFragment">
+
+    <ScrollView
+        android:background="@color/white_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow
+                android:background="@color/color_accent"
+                android:minHeight="180dp">
+
+                <TextView android:id="@+id/time"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center"
+                    android:textColor="@color/color_primary"
+                    android:text="12:00 AM"
+                    android:gravity="center"
+                    android:textSize="72sp"/>
+            </TableRow>
+
+            <TableRow
+                android:background="@color/color_accent"
+                android:layout_marginTop="1dp"
+                android:layout_width="wrap_content">
+                <TextView android:id="@+id/repeating"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:textSize="24sp"
+                    android:textColor="@color/color_primary"
+                    android:text="Repeating"/>
+
+            </TableRow>
+            <TableRow
+                android:background="@color/color_accent" >
+                    <TextView
+                        android:id="@+id/sunday_button"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/color_primary"
+                        android:textSize="24sp"
+                        android:gravity="center"
+                        android:text="Su"/>
+                    <TextView
+                        android:id="@+id/monday_button"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/color_primary"
+                        android:textSize="24sp"
+                        android:gravity="center"
+                        android:text="Mo"/>
+                    <TextView
+                        android:id="@+id/tuesday_button"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/color_primary"
+                        android:textSize="24sp"
+                        android:gravity="center"
+                        android:text="Tu"/>
+                    <TextView
+                        android:id="@+id/wednesday_button"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/color_primary"
+                        android:textSize="24sp"
+                        android:gravity="center"
+                        android:text="We"/>
+                    <TextView
+                        android:id="@+id/thursday_button"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/color_primary"
+                        android:textSize="22sp"
+                        android:gravity="center"
+                        android:text="Th"/>
+                    <TextView
+                        android:id="@+id/friday_button"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/color_primary"
+                        android:textSize="22sp"
+                        android:gravity="center"
+                        android:text="Fr"/>
+                    <TextView
+                        android:id="@+id/saturday_button"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:textColor="@color/color_primary"
+                        android:textSize="24sp"
+                        android:gravity="center"
+                        android:text="Sa"/>
+            </TableRow>
+            <TableRow android:background="@color/color_accent"
+                android:layout_marginTop="1dp">
+                <TextView android:id="@+id/name"
+                    android:layout_width="fill_parent"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/color_primary"
+                    android:textSize="24sp"
+                    android:text="Name"/>
+            </TableRow>
+            <TableRow android:background="@color/color_accent"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content">
+                <EditText android:id="@+id/edit_name"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColorHint="@color/color_primary_dark"
+                    android:textColor="@color/color_primary"
+                    android:layout_width="wrap_content"
+                    android:paddingRight="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:singleLine="true"
+                    android:hint="Alarm Name"/>
+            </TableRow>
+
+            <TableRow
+                android:background="@color/color_accent"
+                android:layout_marginTop="1dp">
+
+                <TextView android:id="@+id/ringtone_button"
+                    android:layout_height="wrap_content"
+                    android:text="Ringtone"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:textColor="@color/color_primary"
+                    android:textSize="24sp"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"/>
+            </TableRow>
+            <TableRow
+                android:background="@color/color_accent">
+
+                <TextView android:id="@+id/current_ringtone"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:gravity="left"
+                    android:textColor="@color/color_primary"
+                    android:textSize="24sp"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"/>
+            </TableRow>
+        </TableLayout>
+
+
+
+    </ScrollView>
+    <TextView android:id="@+id/section_label" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+</RelativeLayout>

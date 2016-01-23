@@ -82,6 +82,7 @@ public class Alarm implements Parcelable {
         this.time = in.readLong();
         this.week = in.createBooleanArray();
         this.active = in.readInt() == 1;
+        this.ID = in.readInt();
         this.contentValues = ContentValues.CREATOR.createFromParcel(in);
     }
 
@@ -199,6 +200,7 @@ public class Alarm implements Parcelable {
     }
 
 
+
 /** PARCELABLE METHODS **/
     @Override
     public int describeContents() {
@@ -212,6 +214,7 @@ public class Alarm implements Parcelable {
         dest.writeLong(time);
         dest.writeBooleanArray(week);
         dest.writeInt(active ? 1 : 0);
+        dest.writeInt(ID);
         contentValues.writeToParcel(dest, 0);
     }
     public static final Creator<Alarm> CREATOR = new Creator<Alarm>() {
