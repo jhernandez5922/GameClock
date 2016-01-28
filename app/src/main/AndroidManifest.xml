@@ -43,14 +43,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".alarm.AlarmListActivity" />
         </activity>
-        <activity
-            android:name=".alarm.creation.EditCreateAlarm"
-            android:label="@string/title_activity_edit_create_alarm"
-            android:parentActivityName=".alarm.AlarmListActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="jhernandez.gameclock.alarm.AlarmListActivity" />
-        </activity>
     </application>
 
 </manifest>

@@ -79,79 +79,15 @@
                 android:textSize="48sp"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true" />
-            <LinearLayout
+            <include
+                layout="@layout/week_picker"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/digital_clock"
                 android:layout_alignParentBottom="true"
                 android:layout_marginRight="15dp"
                 android:orientation="horizontal"
-                android:gravity="center_horizontal">
-
-                <TextView
-                    android:id="@+id/sunday_button"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/color_primary"
-                    android:textSize="24sp"
-                    android:gravity="center"
-                    android:text="Su"/>
-                <TextView
-                    android:id="@+id/monday_button"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/color_primary_dark"
-                    android:textSize="24dp"
-                    android:gravity="center"
-                    android:text="Mo"/>
-                <TextView
-                    android:id="@+id/tuesday_button"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/color_primary"
-                    android:textSize="24dp"
-                    android:gravity="center"
-                    android:text="Tu"/>
-                <TextView
-                    android:id="@+id/wednesday_button"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/color_primary"
-                    android:textSize="24dp"
-                    android:gravity="center"
-                    android:text="We"/>
-                <TextView
-                    android:id="@+id/thursday_button"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/color_primary"
-                    android:textSize="24dp"
-                    android:gravity="center"
-                    android:text="Th"/>
-                <TextView
-                    android:id="@+id/friday_button"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/color_primary"
-                    android:textSize="24dp"
-                    android:gravity="center"
-                    android:text="Fr"/>
-                <TextView
-                    android:id="@+id/saturday_button"
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    android:layout_height="match_parent"
-                    android:textColor="@color/color_primary"
-                    android:textSize="24dp"
-                    android:gravity="center"
-                    android:text="Sa"/>
-            </LinearLayout>
+                android:gravity="center_horizontal" />
         </RelativeLayout>
 
 

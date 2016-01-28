@@ -115,8 +115,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     /**
      *  This function sends the request to the AlarmManager to deactivate the given alarm.
-     * @param context
-     * @param alarm
+     * @param context: To allow the intent to be within the correct context
+     * @param alarm: The alarm to be deactivated
      */
     public static void deactivateAlarm(Context context, Alarm alarm) {
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

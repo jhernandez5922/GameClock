@@ -2,7 +2,7 @@
 
 
 
-    <jhernandez.gameclock.alarm.creation.TimePreference
+    <jhernandez.gameclock.alarm.creation.CustomTimePicker
         android:name="Pick a Time"
         android:key="@string/time_picker" />
 

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageButton  android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:maxWidth="70dp"
+        android:scaleType="fitCenter"
+        android:id="@+id/time_up"
+        android:src="@drawable/arrow_up"
+        android:contentDescription="Increase Hour" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textCursorDrawable="@null"
+        android:textColor="@color/color_primary"
+        android:maxLength="2"
+        android:gravity="center"
+        android:inputType="time"
+        android:text="12"
+        android:selectAllOnFocus="true"
+        android:id="@+id/current_time"
+        android:textSize="60sp" />
+
+    <ImageButton  android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:maxWidth="70dp"
+        android:scaleType="fitCenter"
+        android:id="@+id/time_down"
+        android:src="@drawable/arrow_down"
+        android:contentDescription="Increase Hour" />
+
+</LinearLayout>

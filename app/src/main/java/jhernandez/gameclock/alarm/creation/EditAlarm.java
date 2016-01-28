@@ -4,8 +4,6 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,8 +18,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import com.codetroopers.betterpickers.radialtimepicker.RadialTimePickerDialogFragment;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,13 +113,14 @@ public class EditAlarm extends AppCompatActivity {
     }
 
 
-    public static class GeneralPreferenceFragment extends Fragment implements TextView.OnClickListener, RadialTimePickerDialogFragment.OnTimeSetListener{
+    public static class GeneralPreferenceFragment extends Fragment implements TextView.OnClickListener{
 
         Alarm alarm;
-        int hour, minute;
         boolean [] week;
-        TextView timePicker;
         EditText name;
+        CustomTimePicker timePicker;
+        TextView ampm;
+
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -136,7 +133,7 @@ public class EditAlarm extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_edit_create_alarm, container, false);
             name = (EditText) rootView.findViewById(R.id.edit_name);
-            timePicker = (TextView) rootView.findViewById(R.id.time);
+            timePicker = (CustomTimePicker) rootView.findViewById(R.id.time_picker);
             TextView [] weekViews = new TextView[7];
             for (int i = 0; i < 7; i++) {
                 weekViews[i] = (TextView) rootView.findViewById(WEEK_VIEWS[i]);
@@ -146,46 +143,28 @@ public class EditAlarm extends AppCompatActivity {
                 //SET TIME
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTimeInMillis(alarm.getAlarmTime());
-                hour = currentTime.get(Calendar.HOUR_OF_DAY);
-                minute = currentTime.get(Calendar.MINUTE);
-                timePicker.setText(hour + ":" + minute);
+                timePicker.setHour(currentTime.get(Calendar.HOUR_OF_DAY));
+                timePicker.setMinute(currentTime.get(Calendar.MINUTE));
                 name.setText(alarm.getAlarmName());
                 week = alarm.getWeek();
                 for (int i = 0; i < week.length; i++) {
                     weekViews[i].setTextColor(week[i] ? ContextCompat.getColor(rootView.getContext(), R.color.color_primary)
                             : ContextCompat.getColor(rootView.getContext(), R.color.color_primary_dark));
                 }
-                //SET NAME
             }
             else {
                 alarm = new Alarm();
                 week = new boolean[7];
                 Arrays.fill(week, true);
                 alarm.setEntireWeek(week);
-                hour = 12;
-                minute = 0;
             }
-            timePicker.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //TODO add settings for clock style
-                    Calendar time = Calendar.getInstance();
-                    time.setTimeInMillis(alarm.getAlarmTime());
-                    RadialTimePickerDialogFragment rtpd = new RadialTimePickerDialogFragment()
-                            .setStartTime(time.get(Calendar.HOUR_OF_DAY), time.get(Calendar.MINUTE))
-                            .setThemeCustom(R.style.RadialTimePicker)
-                            .setOnTimeSetListener(GeneralPreferenceFragment.this);
-                    FragmentManager manager = ((FragmentActivity) getActivity()).getSupportFragmentManager();
-                    rtpd.show(manager, "tag");
-                }
-            });
             return rootView;
         }
 
         public Alarm finalizeAlarm() {
             Calendar newTime = Calendar.getInstance();
-            newTime.set(Calendar.HOUR_OF_DAY, hour);
-            newTime.set(Calendar.MINUTE, minute);
+            newTime.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+            newTime.set(Calendar.MINUTE, timePicker.getMinute());
             newTime.set(Calendar.SECOND, 0);
             alarm.setEntireWeek(week);
             alarm.setAlarmTime(newTime.getTimeInMillis());
@@ -209,14 +188,6 @@ public class EditAlarm extends AppCompatActivity {
             alarm.setWeekDay(index, !alarm.getWeekDay(index));
             tv.setTextColor(alarm.getWeekDay(index) ? ContextCompat.getColor(v.getContext(), R.color.color_primary)
                     : ContextCompat.getColor(v.getContext(), R.color.color_primary_dark));
-        }
-
-        @Override
-        public void onTimeSet(RadialTimePickerDialogFragment dialog, int hourOfDay, int minute) {
-            this.hour = hourOfDay;
-            this.minute = minute;
-            //TODO add 12-Hour format
-            timePicker.setText(hourOfDay + ":" + minute);
         }
     }
 
