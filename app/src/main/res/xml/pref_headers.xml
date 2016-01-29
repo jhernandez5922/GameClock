@@ -2,7 +2,7 @@
 
     <!-- These settings headers are only used on tablets. -->
 
-    <header android:fragment="jhernandez.gameclock.alarm.creation.EditAlarm$GeneralPreferenceFragment"
+    <header android:fragment="jhernandez.gameclock.alarm.creation.EditAlarm$AlarmEditFragment"
         android:title="@string/pref_header_general" />
 
     <header android:fragment="jhernandez.gameclock.alarm.creation.EditAlarm$NotificationPreferenceFragment"

@@ -17,6 +17,7 @@ import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import jhernandez.gameclock.R;
 
@@ -49,6 +50,9 @@ public class AlarmReceiver extends BroadcastReceiver {
         //Deactivate alarm repeating
 
         Alarm alarm = intent.getParcelableExtra("alarm");
+        if (alarm == null) {
+            return;
+        }
         AlarmReceiver.deactivateAlarm(context, alarm);
 
         NotificationManager nm = (NotificationManager) context
@@ -56,7 +60,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
         builder.setSmallIcon(R.drawable.explosion)
                 .setContentTitle(alarm.getAlarmName() + " went off!")
                 .setContentText("Time: " + sdf.format(alarm.getAlarmTime()));

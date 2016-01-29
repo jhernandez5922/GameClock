@@ -1,5 +1,5 @@
 
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:id="@+id/fragment"
-    android:name="jhernandez.gameclock.alarm.creation.EditAlarm$GeneralPreferenceFragment" tools:layout="@layout/fragment_edit_create_alarm"
+    android:name="jhernandez.gameclock.alarm.creation.EditAlarm$AlarmEditFragment" tools:layout="@layout/fragment_edit_create_alarm"
     android:layout_width="match_parent" android:layout_height="match_parent" />

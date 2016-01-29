@@ -65,6 +65,9 @@ public class CustomTimePicker extends RelativeLayout implements View.OnClickList
     }
 
     public void setHour(int hour) {
+        if (hour > 12) {
+            hour -= 12;
+        }
         hourSelect.setCurrentTime(hour);
     }
     public void setMinute(int minute) {
@@ -74,4 +77,10 @@ public class CustomTimePicker extends RelativeLayout implements View.OnClickList
     private boolean isAm() {
         return am;
     }
+
+    public void setAmPm (boolean amPm) {
+        this.amPm.setText(amPm ? "PM" : "AM");
+        this.am = amPm;
+    }
+
 }

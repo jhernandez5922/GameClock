@@ -149,6 +149,6 @@ public class NumberRangePicker extends LinearLayout implements View.OnClickListe
 
     public void setCurrentTime(int time) {
         this.current = time;
-        numberDisplay.setText(time);
+        numberDisplay.setText(String.valueOf(time));
     }
 }

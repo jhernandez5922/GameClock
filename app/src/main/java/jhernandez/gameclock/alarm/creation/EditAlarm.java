@@ -64,7 +64,7 @@ public class EditAlarm extends AppCompatActivity {
         Bundle bundle = new Bundle();
         Alarm alarm = getIntent().getParcelableExtra("alarm");
         bundle.putParcelable("alarm", alarm);
-        GeneralPreferenceFragment settingsFrag = new GeneralPreferenceFragment();
+        AlarmEditFragment settingsFrag = new AlarmEditFragment();
         settingsFrag.setArguments(bundle);
         getFragmentManager().beginTransaction().replace(R.id.content_frame,
                 settingsFrag, FRAG_TAG).commit();
@@ -100,7 +100,7 @@ public class EditAlarm extends AppCompatActivity {
             //intent.putExtra("active"+idx, checked);
             //Format the time from the timePicker and
             Intent intent = new Intent();
-            alarm = ((GeneralPreferenceFragment) getFragmentManager().findFragmentByTag(FRAG_TAG)).finalizeAlarm();
+            alarm = ((AlarmEditFragment) getFragmentManager().findFragmentByTag(FRAG_TAG)).finalizeAlarm();
             //Add to Intent
             intent.putExtra("alarm", alarm);
             //Let menu activity know results from intent are okay
@@ -113,14 +113,12 @@ public class EditAlarm extends AppCompatActivity {
     }
 
 
-    public static class GeneralPreferenceFragment extends Fragment implements TextView.OnClickListener{
+    public static class AlarmEditFragment extends Fragment implements TextView.OnClickListener{
 
         Alarm alarm;
         boolean [] week;
         EditText name;
         CustomTimePicker timePicker;
-        TextView ampm;
-
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -144,6 +142,7 @@ public class EditAlarm extends AppCompatActivity {
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTimeInMillis(alarm.getAlarmTime());
                 timePicker.setHour(currentTime.get(Calendar.HOUR_OF_DAY));
+                timePicker.setAmPm(currentTime.get(Calendar.HOUR_OF_DAY) > 12);
                 timePicker.setMinute(currentTime.get(Calendar.MINUTE));
                 name.setText(alarm.getAlarmName());
                 week = alarm.getWeek();
@@ -274,6 +273,4 @@ public class EditAlarm extends AppCompatActivity {
         }
         return days.toString();
     }
-
-
 }
