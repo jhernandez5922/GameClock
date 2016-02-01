@@ -79,13 +79,12 @@
                 android:textSize="48sp"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true" />
-            <include
-                layout="@layout/week_picker"
+            <jhernandez.gameclock.alarm.creation.WeekPicker
+                android:id="@+id/week_picker"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/digital_clock"
                 android:layout_alignParentBottom="true"
-                android:layout_marginRight="15dp"
                 android:orientation="horizontal"
                 android:gravity="center_horizontal" />
         </RelativeLayout>

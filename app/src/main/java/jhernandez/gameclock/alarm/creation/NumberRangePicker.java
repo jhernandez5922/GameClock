@@ -5,6 +5,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -15,14 +16,15 @@ import jhernandez.gameclock.R;
 /**
  * Created by Jason on 1/24/2016.
  */
-public class NumberRangePicker extends LinearLayout implements View.OnClickListener, TextWatcher, View.OnFocusChangeListener {
+public class NumberRangePicker extends LinearLayout implements View.OnClickListener, TextWatcher, View.OnFocusChangeListener, View.OnTouchListener {
 
     LayoutInflater mInflater;
     int max, min, current, baseLength;
-    boolean applyBaseLength;
+    boolean hasBaseLength;
     EditText numberDisplay;
     View rootView;
     ImageButton upButton, downButton;
+    private boolean incrementing;
 
     public NumberRangePicker(Context context) {
         super(context);
@@ -49,8 +51,10 @@ public class NumberRangePicker extends LinearLayout implements View.OnClickListe
         upButton = (ImageButton) rootView.findViewById(R.id.time_up);
         downButton = (ImageButton) rootView.findViewById(R.id.time_down);
         setMode(1, 12, 12);
-        upButton.setOnClickListener(this);
-        downButton.setOnClickListener(this);
+//        upButton.setOnClickListener(this);
+        upButton.setOnTouchListener(this);
+//        downButton.setOnClickListener(this);
+        downButton.setOnTouchListener(this);
         numberDisplay.addTextChangedListener(this);
     }
 
@@ -63,11 +67,11 @@ public class NumberRangePicker extends LinearLayout implements View.OnClickListe
         this.current = current;
         numberDisplay.setText(String.format("%02d", current));
         if (baseLength < 0) {
-            applyBaseLength = false;
+            hasBaseLength = false;
             this.baseLength = 0;
         } else {
             this.baseLength = baseLength;
-            applyBaseLength = true;
+            hasBaseLength = true;
             numberDisplay.setOnFocusChangeListener(this);
         }
     }
@@ -139,7 +143,7 @@ public class NumberRangePicker extends LinearLayout implements View.OnClickListe
 
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
-        if (!hasFocus && applyBaseLength) {
+        if (!hasFocus && hasBaseLength) {
             numberDisplay.setText(String.format("%"+baseLength+"s", numberDisplay.getText().toString()).replace(' ', '0'));
         }
     }
@@ -151,5 +155,32 @@ public class NumberRangePicker extends LinearLayout implements View.OnClickListe
     public void setCurrentTime(int time) {
         this.current = time;
         numberDisplay.setText(String.valueOf(time));
+        if (hasBaseLength)
+            numberDisplay.setText(String.format("%"+baseLength+"s", numberDisplay.getText().toString()).replace(' ', '0'));
+
     }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        int a = event.getAction();
+
+        if (v.getId() == R.id.time_up) {
+            if (a == MotionEvent.ACTION_DOWN) {
+                //startIncrementing(1);
+            }
+            else if (a == MotionEvent.ACTION_UP) {
+                //stopIncrementing();
+            }
+        }
+        else if (v.getId() == R.id.time_down) {
+            if (a == MotionEvent.ACTION_DOWN) {
+                //startIncrementing(-1);
+            }
+            else if (a == MotionEvent.ACTION_UP) {
+                //stopIncrementing();
+            }
+        }
+        return true;
+    }
+
 }

@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 
 import jhernandez.gameclock.R;
 import jhernandez.gameclock.alarm.creation.EditAlarm;
+import jhernandez.gameclock.alarm.creation.WeekPicker;
 import jhernandez.gameclock.sqlite.AlarmContract;
 
 /**
@@ -38,7 +39,6 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder implements CompoundButton.OnCheckedChangeListener {
-        // each data item is just a string in this case
         protected TextView titleText;
         protected CardView card;
         protected SwipeLayout swipeLayout;
@@ -195,37 +195,16 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
 
     private void setUpWeek(View v, Cursor cursor) {
 
-        int [] weekViews = new int[] {
-                R.id.sunday_button,
-                R.id.monday_button,
-                R.id.tuesday_button,
-                R.id.wednesday_button,
-                R.id.thursday_button,
-                R.id.friday_button,
-                R.id.saturday_button
-        };
+        final WeekPicker week = (WeekPicker) v.findViewById(R.id.week_picker);
         final Alarm current = new Alarm(cursor);
-        for (int i = 0; i < 7; i++) {
-            TextView tv = (TextView) v.findViewById(weekViews[i]);
-            tv.setTextColor(
-                    current.getWeekDay(i) ? ContextCompat.getColor(v.getContext(), R.color.color_primary)
-                            : ContextCompat.getColor(v.getContext(), R.color.color_primary_dark)
-            );
-            final int index = i;
-            tv.setOnClickListener(new TextView.OnClickListener() {
+        week.setWeekOnClickListener(new TextView.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    current.setWeekDay(index, !current.getWeekDay(index));
-                    boolean day = current.getWeekDay(index);
-                    current.setWeekDay(index, day);
-                    ((TextView) v).setTextColor(
-                            day ? ContextCompat.getColor(v.getContext(), R.color.color_primary)
-                                    : ContextCompat.getColor(v.getContext(), R.color.color_primary_dark)
-                    );
+                    week.onClick(v);
+                    current.setEntireWeek(week.getWeek());
                     AlarmReceiver.setAlarm(mContext.getApplicationContext(), current);
                     mContext.getContentResolver().update(AlarmContract.AlarmEntry.CONTENT_URI, current.contentValues,"_id=" + current.getID(), null );
                 }
             });
         }
-    }
 }

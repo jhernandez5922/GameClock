@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,30 +34,14 @@ import jhernandez.gameclock.alarm.Alarm;
 
 
 /**
- * A {@link PreferenceActivity} that presents a set of application settings. On
- * handset devices, settings are presented as a single list. On tablets,
- * settings are split by category, with category headers shown to the left of
- * the list of settings.
- * <p/>
- * See <a href="http://developer.android.com/design/patterns/settings.html">
- * Android Design: Settings</a> for design guidelines and the <a
- * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
- * API Guide</a> for more information on developing a Settings UI.
+ *
  */
-public class EditAlarm extends AppCompatActivity {
+public class EditAlarm extends AppCompatActivity implements View.OnClickListener {
 
     Alarm alarm;
 
-    private final static String FRAG_TAG = "Alarm Preference";
-    private final static int [] WEEK_VIEWS = {
-            R.id.sunday_button,
-            R.id.monday_button,
-            R.id.tuesday_button,
-            R.id.wednesday_button,
-            R.id.thursday_button,
-            R.id.friday_button,
-            R.id.saturday_button
-    };
+    private final static String FRAG_TAG = "Alarm Edit/Create";
+
     private final static int TONE_PICKER = 867;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +49,10 @@ public class EditAlarm extends AppCompatActivity {
         setContentView(R.layout.preference_activity_toolbar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        Button save = (Button) findViewById(R.id.save_alarm);
+        Button cancel = (Button) findViewById(R.id.cancel_alarm);
+        save.setOnClickListener(this);
+        cancel.setOnClickListener(this);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         Bundle bundle = new Bundle();
         Alarm alarm = getIntent().getParcelableExtra("alarm");
@@ -76,8 +65,8 @@ public class EditAlarm extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_edit_alarm, menu);
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.menu_edit_alarm, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -116,6 +105,38 @@ public class EditAlarm extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.save_alarm:
+                Intent intent = new Intent();
+                alarm = ((AlarmEditFragment) getFragmentManager().findFragmentByTag(FRAG_TAG)).finalizeAlarm();
+                //Add to Intent
+                intent.putExtra("alarm", alarm);
+                //Let menu activity know results from intent are okay
+                setResult(RESULT_OK, intent);
+                break;
+            case R.id.cancel_alarm:
+                setResult(RESULT_CANCELED);
+                break;
+        }
+        finish();
+    }
+
+    /**
+     * This class is an extenstion of the Fragment class and is used to display the contents in
+     * which the user will create or edit an alarm. This screen is shared between the two, only
+     * the starting data is different.
+     *
+     * Members:
+     *  Alarm alarm -> The current alarm with the settings the user defined
+     *  boolean [] week -> An array for each day of the week, to determine if this day is active or not
+     *  EditText name -> The EditText box used to define the name of the alarm
+     *  CustomTimePicker timePicker -> used to determine the time in which the alarm will trigger
+     *      see jhernandez.gameclock.alarm.creation.CustomTimePicker for more
+     *  Context appContext -> the Context of the activity, used for the RingtoneManager
+     *  TextView currentRingtone -> The text to represent the user's currently choosen Ringtone
+     */
     public static class AlarmEditFragment extends Fragment implements View.OnClickListener{
 
         Alarm alarm;
@@ -125,6 +146,11 @@ public class EditAlarm extends AppCompatActivity {
         Context appContext;
         TextView currentRingtone;
 
+        /**
+         * This is the first function called to create the fragment, it grabs the alarm (if present) and
+         * sets the member variable appContext to the activity's context
+         * @param savedInstanceState: The state of this instance if previously saved
+         */
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -132,63 +158,87 @@ public class EditAlarm extends AppCompatActivity {
             appContext = getActivity();
         }
 
+        /**
+         * This function inflates the screen the user will use to set the parameters of the alarm
+         * If this screen was prompted via the FAB to create:
+         *  -this will define a new alarm, with default settings
+         * If this screen was prompted via the Edit tab:
+         *  -this will use the current state of the alarm to populate the data
+         *
+         * @param inflater: used to bring the view to the screen
+         * @param container: used to define the ViewGroup in which the inflated view will be contained within
+         * @param savedInstanceState: The state in which the instance was at currently if opened previously
+         * @return the View that will be brought to the front of the screen
+         */
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_edit_create_alarm, container, false);
             name = (EditText) rootView.findViewById(R.id.edit_name);
             timePicker = (CustomTimePicker) rootView.findViewById(R.id.time_picker);
-            //TextView [] weekViews = new TextView[7];
             TextView ringtoneTitle = (TextView) rootView.findViewById(R.id.ringtone_button);
             currentRingtone = (TextView) rootView.findViewById(R.id.current_ringtone);
+            //Set both title and description onClickListeners
             ringtoneTitle.setOnClickListener(this);
             currentRingtone.setOnClickListener(this);
-//
-//            for (int i = 0; i < 7; i++) {
-//                weekViews[i] = (TextView) rootView.findViewById(WEEK_VIEWS[i]);
-//                weekViews[i].setOnClickListener(this);
-//            }
+            WeekPicker weekPicker = (WeekPicker) rootView.findViewById(R.id.week_picker);
+            //Set to Current Settings or Default, depending on Editing or Creating an alarm, respectively
             if (alarm != null) {
-                //SET TIME
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTimeInMillis(alarm.getAlarmTime());
                 timePicker.setHour(currentTime.get(Calendar.HOUR_OF_DAY));
                 timePicker.setMinute(currentTime.get(Calendar.MINUTE));
                 name.setText(alarm.getAlarmName());
                 week = alarm.getWeek();
-//                for (int i = 0; i < week.length; i++) {
-//                    weekViews[i].setTextColor(week[i] ? ContextCompat.getColor(rootView.getContext(), R.color.color_primary)
-//                            : ContextCompat.getColor(rootView.getContext(), R.color.color_primary_dark));
-//                }
+                weekPicker.setWeek(week);
             }
             else {
                 alarm = new Alarm();
                 week = new boolean[7];
                 Arrays.fill(week, true);
                 alarm.setEntireWeek(week);
+                weekPicker.setWeek(week);
             }
             return rootView;
         }
 
+        /**
+         * This function gathers all of the information the users has selected and packages
+         * it into an Alarm object, see jhernandez.gameclock.alarm.Alarm for more
+         * @return The most update to alarm based on the settings chosen
+         */
         public Alarm finalizeAlarm() {
+            //Set Time
             Calendar newTime = Calendar.getInstance();
             newTime.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
             newTime.set(Calendar.MINUTE, timePicker.getMinute());
             newTime.set(Calendar.SECOND, 0);
-            alarm.setEntireWeek(week);
             alarm.setAlarmTime(newTime.getTimeInMillis());
+            //Set Week
+            alarm.setEntireWeek(week);
+            //Set Name
             if (name.getText().toString().equals("")) {
                 alarm.setAlarmName("Alarm");
             }
             else
                 alarm.setAlarmName(name.getText().toString());
+            //Set Active
             alarm.setActive(true);
             return alarm;
         }
 
+        /**
+         * This function provides a method for the OnClickListener implementation for this object
+         * It supports clicking for
+         *  R.id.ringtone_button & R.id.current_ringtone
+         *  These two are current used to open the dialog window to pick a ringtone for the alarm
+         *
+         * @param view: The view that was clicked, the switch statement grabs it's ID and decides which
+         *            code to execute
+         */
         @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
+        public void onClick(View view) {
+            switch (view.getId()) {
                 case R.id.ringtone_button:
                 case R.id.current_ringtone:
                     final Uri currentTone = RingtoneManager.getActualDefaultRingtoneUri(appContext, RingtoneManager.TYPE_ALARM);
@@ -200,16 +250,24 @@ public class EditAlarm extends AppCompatActivity {
                     intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
                     intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
                     startActivityForResult(intent, EditAlarm.TONE_PICKER);
-
             }
-
         }
 
+        /**
+         * This function gets the result from the ringtone dialog and adds them to the alarm.
+         *
+         * @param requestCode: The original function that called the request, used in order to execute
+         *                   the correct code
+         * @param resultCode: The status of the closing of the dialog, checks to make sure it is okay
+         *                  to execute code needed
+         * @param data: The intent that was sent back to this one, it can contain extras used to perform
+         *            actions
+         */
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
             if (resultCode == RESULT_OK) {
                 if (requestCode == TONE_PICKER) {
-                    Toast.makeText(getActivity(), "CORRECT", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getActivity(), "CORRECT", Toast.LENGTH_SHORT).show();
                     Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
                     Ringtone current = RingtoneManager.getRingtone(appContext, uri);
                     String ringtoneName = current.getTitle(appContext);
@@ -217,69 +275,5 @@ public class EditAlarm extends AppCompatActivity {
                 }
             }
         }
-    }
-
-    private static boolean [] setWeek(String value) {
-        List<String> selections = new ArrayList<>(Arrays.asList(value.replaceAll("[^A-Za-z]", " ").split(" ")));
-        selections.removeAll(Arrays.asList(""));
-        boolean [] week = new boolean[7];
-        if(selections.contains("Su"))
-            week[0] = true;
-        if(selections.contains("Mo"))
-            week[1] = true;
-        if (selections.contains("Tu"))
-            week[2] = true;
-        if(selections.contains("We"))
-            week[3] = true;
-        if (selections.contains("Th"))
-            week[4] = true;
-        if(selections.contains("Fr"))
-            week[5] = true;
-        if (selections.contains("Sa"))
-            week[6] = true;
-        return week;
-    }
-
-    private static String dayOfWeek (int i) {
-        switch(i) {
-            case 0:
-                return "Sun ";
-            case 1:
-                return "Mon ";
-            case 2:
-                return "Tue ";
-            case 3:
-                return "Wed ";
-            case 4:
-                return "Thu ";
-            case 5:
-                return "Fri ";
-            case 6:
-                return "Sat ";
-            default:
-                return "";
-        }
-    }
-    private static String getDays(String value) {
-        boolean[] week = setWeek(value);
-        return getStringFromWeek(week);
-    }
-
-
-
-    private static String getStringFromWeek(boolean [] week) {
-        StringBuilder days = new StringBuilder();
-        LinkedList<Integer> next = new LinkedList<>();
-        int hours = 24;
-        for (int i = 0; i < 7; i++) {
-            if (!week[i]){
-                hours+=24;
-                continue;
-            }
-            days.append(dayOfWeek(i));
-            next.add(hours);
-            hours = 24;
-        }
-        return days.toString();
     }
 }

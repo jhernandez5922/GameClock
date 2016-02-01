@@ -1,12 +1,15 @@
 package jhernandez.gameclock.alarm.creation;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.Arrays;
 
 import jhernandez.gameclock.R;
 
@@ -20,7 +23,7 @@ public class WeekPicker extends LinearLayout implements View.OnClickListener {
     View rootView;
     boolean [] week;
     TextView [] weekViews;
-    private final static int [] WEEK_VIEWS_NAMES = {
+    public final static int [] WEEK_VIEWS_NAMES = {
             R.id.sunday_button,
             R.id.monday_button,
             R.id.tuesday_button,
@@ -46,22 +49,37 @@ public class WeekPicker extends LinearLayout implements View.OnClickListener {
         init(context);
     }
 
+    public void setWeekOnClickListener(View.OnClickListener listener) {
+        for (int i = 0; i < 7; i++) {
+            View v = rootView.findViewById(WEEK_VIEWS_NAMES[i]);
+            v.setOnClickListener(listener);
+        }
+    }
+
     private void init(Context context) {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         rootView = mInflater.inflate(R.layout.week_picker, this, true);
         week = new boolean[7];
+        Arrays.fill(week, true);
         if (mInflater == null) {
             return;
         }
         weekViews = new TextView[7];
-        for (int i = 0; i < 7; i ++) {
-            weekViews[i] = (TextView) rootView.findViewById(WEEK_VIEWS_NAMES[i]);
-            weekViews[i].setOnClickListener(this);
-        }
+        setWeekOnClickListener(this);
     }
 
     public void setWeek(boolean[] week) {
+        if (week.length < 7)
+            return;
         this.week = week;
+        for (int i = 0; i < 7; i++) {
+            TextView temp = (TextView) findViewById(WEEK_VIEWS_NAMES[i]);
+            setDayButton(temp, this.week[i]);
+        }
+    }
+
+    public boolean[] getWeek() {
+        return week;
     }
 
     @Override
@@ -73,12 +91,21 @@ public class WeekPicker extends LinearLayout implements View.OnClickListener {
             return;
         }
         week[index] = !week[index];
-        tv.setBackgroundResource(week[index] ?
-                R.drawable.week_gradient :
-                R.drawable.week_gradient_inverse);
+        setDayButton(tv, week[index]);
     }
 
-    private static int getDay(String value) {
+
+
+
+    private void setDayButton(TextView day, boolean on) {
+        day.setBackgroundResource(on ?
+                R.drawable.week_gradient :
+                R.drawable.week_gradient_inverse);
+        day.setTextColor(on ?
+                ContextCompat.getColor(day.getContext(), R.color.black_overlay) :
+                ContextCompat.getColor(day.getContext(), R.color.color_accent));
+    }
+    public static int getDay(String value) {
         switch(value) {
             case "Su":
                 return 0;

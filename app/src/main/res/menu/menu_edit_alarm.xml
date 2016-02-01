@@ -2,7 +2,7 @@
 xmlns:app="http://schemas.android.com/apk/res-auto"
 xmlns:tools="http://schemas.android.com/tools"
 tools:context="jhernandez.gameclock.alarm.creation.EditAlarm">
-<item android:id="@+id/save_alarm" android:title="Save"
-    android:icon="@android:drawable/ic_menu_save"
-    android:orderInCategory="1" app:showAsAction="always" />
+    <item android:id="@+id/save_alarm" android:title="Save"
+        android:icon="@android:drawable/ic_menu_save"
+        android:orderInCategory="1" app:showAsAction="always" />
 </menu>

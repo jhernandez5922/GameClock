@@ -1,9 +1,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white_background"
     tools:context="jhernandez.gameclock.alarm.creation.EditAlarm.AlarmEditFragment">
-
     <ScrollView
         android:background="@color/black_overlay"
         android:layout_width="match_parent"
@@ -45,6 +45,7 @@
             <TableRow
                 android:background="@color/white_background" >
                     <jhernandez.gameclock.alarm.creation.WeekPicker layout="@layout/week_picker"
+                        android:id="@+id/week_picker"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1" />
@@ -70,10 +71,9 @@
                     android:backgroundTint="@color/black_overlay"
                     android:textColor="@color/color_primary"
                     android:layout_width="wrap_content"
-                    android:paddingRight="20dp"
                     android:layout_marginBottom="10dp"
                     android:singleLine="true"
-                    android:hint="Alarm Name"/>
+                    android:hint="Give your alarm a name!"/>
             </TableRow>
 
             <TableRow
@@ -94,10 +94,10 @@
 
                 <TextView android:id="@+id/current_ringtone"
                     android:layout_height="wrap_content"
-                    android:text="@string/pref_default_display_name"
+                    android:text="Default Ringtone"
                     android:gravity="left"
                     android:textColor="@color/color_primary"
-                    android:textSize="@dimen/title_text_size"
+                    android:textSize="@dimen/text"
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"/>
@@ -112,6 +112,7 @@
                         android:layout_weight="0.5"
                         android:src="@android:drawable/ic_lock_silent_mode_off"/>
                     <SeekBar
+                        android:id="@+id/ringtone_volume"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="3"
@@ -122,15 +123,25 @@
             <TableRow
                 android:background="@color/white_background">
 
-
-                <TextView
+                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black_overlay"
                     android:textSize="@dimen/title_text_size"
                     android:text="Games"/>
             </TableRow>
-        </TableLayout>
+            <TableRow
+                android:background="@color/white_background">
+
+                <CheckBox
+                    android:text="Sheep Jump"
+                    android:textColor="@color/color_primary"
+                    android:textSize="@dimen/text"/>
+
+
+            </TableRow>
+
+                </TableLayout>
 
 
 
