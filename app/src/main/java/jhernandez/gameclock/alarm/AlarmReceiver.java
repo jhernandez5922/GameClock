@@ -1,16 +1,13 @@
 package jhernandez.gameclock.alarm;
 
 import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.WakefulBroadcastReceiver;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -18,8 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-
-import jhernandez.gameclock.R;
 
 /**
  * This class holds the methods to receive alarm triggers and even to set or deactivate alarms.
@@ -30,7 +25,7 @@ import jhernandez.gameclock.R;
  * Last updated: 1/16/15 by Jason
  *
  */
-public class AlarmReceiver extends BroadcastReceiver {
+public class AlarmReceiver extends WakefulBroadcastReceiver {
 
     /**
      * This function tells the device what to do now that an alarm has been triggered
@@ -49,25 +44,17 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         //Deactivate alarm repeating
 
+        //WakeLocker.acquire(context);
+        Log.d(this.getClass().getSimpleName(), "ALARM RECEIVED");
         Alarm alarm = intent.getParcelableExtra("alarm");
         if (alarm == null) {
             return;
         }
-        AlarmReceiver.deactivateAlarm(context, alarm);
+        Intent alarmTriggered = new Intent(context, GameBridge.class);
+        alarmTriggered.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        alarmTriggered.putExtra("alarm", alarm);
+        context.startActivity(alarmTriggered);
 
-        NotificationManager nm = (NotificationManager) context
-                .getSystemService(Context.NOTIFICATION_SERVICE);
-
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
-        builder.setSmallIcon(R.drawable.explosion)
-                .setContentTitle(alarm.getAlarmName() + " went off!")
-                .setContentText("Time: " + sdf.format(alarm.getAlarmTime()));
-        Notification n = builder.build();
-        nm.notify(0, n);
-
-        AlarmReceiver.setAlarm(context, alarm);
 
     }
 
@@ -83,13 +70,12 @@ public class AlarmReceiver extends BroadcastReceiver {
         setTime.set(Calendar.HOUR_OF_DAY, hour);
         setTime.set(Calendar.MINUTE, minute);
         int day = setTime.get(Calendar.DAY_OF_WEEK);
-        int increase;
-        boolean flag = false;
+        int increase = 0;
         if (currentTime.after(setTime)) {
             day++;
-            flag = true;
+            increase++;
         }
-        for (increase = flag ? 1 : 0; increase < 7; increase++) {
+        for (; increase < 7; increase++) {
             if (day == 8) {
                 day = 1;
             }
@@ -99,7 +85,9 @@ public class AlarmReceiver extends BroadcastReceiver {
             day++;
         }
         if (increase == 7 && !week[day - 1]) {
-            return null;
+            increase = currentTime.after(setTime) ? 1 : 0;
+            setTime.set(Calendar.DAY_OF_WEEK, setTime.get(Calendar.DAY_OF_WEEK) + increase);
+            return setTime;
         }
         increase += setTime.get(Calendar.DAY_OF_YEAR);
         setTime.set(Calendar.DAY_OF_WEEK, day);
@@ -169,7 +157,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 alarmMgr.set(AlarmManager.RTC_WAKEUP, alarmSetTime.getTimeInMillis(), alarmIntent);
 
             //Notify set
-            SimpleDateFormat sdf = new SimpleDateFormat("M/d/y h:mm a");
+            SimpleDateFormat sdf = new SimpleDateFormat("M/d/y h:mm a", Locale.US);
             Log.v("GameClock Alarm Setting", alarm.getAlarmName().toUpperCase() + " SET FOR: " + sdf.format(alarmSetTime.getTime()));
             Toast.makeText(context, alarm.getAlarmName() + " set for: " + sdf.format(alarm.getAlarmTime()), Toast.LENGTH_SHORT).show();
 

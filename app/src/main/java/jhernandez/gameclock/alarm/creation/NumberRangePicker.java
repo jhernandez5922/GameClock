@@ -41,7 +41,7 @@ public class NumberRangePicker extends LinearLayout implements View.OnClickListe
 
     private void init(Context context) {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        rootView = mInflater.inflate(R.layout.custom_picker, this, true);
+        rootView = mInflater.inflate(R.layout.number_range_picker, this, true);
         if (mInflater == null) {
             return;
         }
@@ -61,6 +61,7 @@ public class NumberRangePicker extends LinearLayout implements View.OnClickListe
         this.max = max;
         this.min = min;
         this.current = current;
+        numberDisplay.setText(String.format("%02d", current));
         if (baseLength < 0) {
             applyBaseLength = false;
             this.baseLength = 0;

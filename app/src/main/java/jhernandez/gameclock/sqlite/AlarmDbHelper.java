@@ -29,6 +29,7 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
                 AlarmEntry.COLUMN_NAME + " TEXT NOT NULL," +
                 AlarmEntry.COLUMN_TIME + " INTEGER NOT NULL," +
                 AlarmEntry.COLUMN_ACTIVE + " INTEGER NOT NULL, " +
+                AlarmEntry.COLUMN_RINGTONE + " TEXT NOT NULL, " +
                 AlarmEntry.COLUMN_SUN + " INTEGER NOT NULL," +
                 AlarmEntry.COLUMN_MON + " INTEGER NOT NULL," +
                 AlarmEntry.COLUMN_TUE + " INTEGER NOT NULL," +
@@ -71,6 +72,10 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
 
     public static boolean getAlarmActive (Cursor cursor) {
         return cursor.getInt(cursor.getColumnIndex(AlarmEntry.COLUMN_ACTIVE)) == 1;
+    }
+
+    public static String getAlarmRingtone (Cursor cursor) {
+        return cursor.getString(cursor.getColumnIndex(AlarmEntry.COLUMN_RINGTONE));
     }
 
 

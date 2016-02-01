@@ -33,6 +33,8 @@ public class AlarmContract {
 
         public static final String COLUMN_ACTIVE = "active";
 
+        public static final String COLUMN_RINGTONE = "ringtone";
+
         public static final String COLUMN_SUN = "sunday";
         public static final String COLUMN_MON = "monday";
         public static final String COLUMN_TUE = "tuesday";

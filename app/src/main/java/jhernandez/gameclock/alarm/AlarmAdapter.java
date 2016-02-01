@@ -145,6 +145,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                 removeItem(position);
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(position, mCursorAdapter.getCount());
+                AlarmReceiver.deactivateAlarm(mContext, holder.alarm);
                 Toast.makeText(view.getContext(), "Deleted " + holder.titleText.getText().toString() + "!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -153,10 +154,9 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
             public void onClick(View v) {
                 Cursor c = mCursorAdapter.getCursor();
                 c.moveToPosition(position);
-                Alarm alarm = new Alarm(c);
-                AlarmReceiver.deactivateAlarm(mContext.getApplicationContext(), alarm);
+                AlarmReceiver.deactivateAlarm(mContext.getApplicationContext(), holder.alarm);
                 Intent intent = new Intent(mContext, EditAlarm.class);
-                intent.putExtra("alarm", alarm);
+                intent.putExtra("alarm", holder.alarm);
                 ((AlarmListActivity) mContext).startActivityForResult(intent, 1);
             }
         });

@@ -11,6 +11,7 @@ import android.view.SurfaceView;
 import jhernandez.gameclock.R;
 import jhernandez.gameclock.game.objects.Background;
 import jhernandez.gameclock.game.objects.Player;
+import jhernandez.gameclock.util.WakeLocker;
 
 /**
  * Created by Jason on 10/12/2015.
@@ -62,6 +63,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
                 e.printStackTrace();
             }
         }
+        //WakeLocker.release();
     }
 
     @Override

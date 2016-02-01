@@ -16,6 +16,7 @@ import jhernandez.gameclock.sqlite.AlarmContract;
 
 public class AlarmListActivity extends AppCompatActivity {
 
+    public static String TAG = AlarmListActivity.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

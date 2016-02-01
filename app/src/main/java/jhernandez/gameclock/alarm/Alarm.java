@@ -30,6 +30,7 @@ public class Alarm implements Parcelable {
      *  boolean week [] -> An array to indicate whether or not a weekday will trigger an alarm
      *  int ID -> the unique ID given to an alarm when created in the database
      *  boolean active -> To indicate if the alarm will trigger at the next specified time
+     *  String ringtone -> The string version of the Uri used to get the ringtone via RingtoneManager
      *  ContentValues contentValues -> Formats all the previous class members to allow them to
      *                                  be entered into the database.
      *                                  See android.content.ContentValues for more
@@ -42,6 +43,7 @@ public class Alarm implements Parcelable {
     private boolean week [];
     private int ID;
     private boolean active;
+    private String ringtone;
     ContentValues contentValues;
     public static final String weekName [] = {
             AlarmEntry.COLUMN_SUN,
@@ -61,11 +63,12 @@ public class Alarm implements Parcelable {
         this.contentValues = new ContentValues();
         this.ID = -1;
         this.active = true;
+        this.ringtone = "content://media/internal/audio/media/43";
         putToCV();
     }
 
     //Takes inputs and maps to Alarm class
-    public Alarm(String name, long time, boolean [] week, int ID, boolean active) {
+    public Alarm(String name, long time, boolean [] week, int ID, boolean active, String ringtone) {
         this.name = name;
         this.time = time;
         if (!this.setEntireWeek(week));
@@ -73,6 +76,7 @@ public class Alarm implements Parcelable {
         this.contentValues = new ContentValues();
         this.ID = ID;
         this.active = active;
+        this.ringtone = ringtone;
         putToCV();
     }
 
@@ -83,6 +87,7 @@ public class Alarm implements Parcelable {
         this.week = in.createBooleanArray();
         this.active = in.readInt() == 1;
         this.ID = in.readInt();
+        this.ringtone = in.readString();
         this.contentValues = ContentValues.CREATOR.createFromParcel(in);
     }
 
@@ -93,6 +98,7 @@ public class Alarm implements Parcelable {
         this.week = AlarmDbHelper.getAlarmWeek(cursor);
         this.ID = AlarmDbHelper.getAlarmID(cursor);
         this.active = AlarmDbHelper.getAlarmActive(cursor);
+        this.ringtone = AlarmDbHelper.getAlarmRingtone(cursor);
         this.contentValues = new ContentValues();
         putToCV();
     }
@@ -100,6 +106,7 @@ public class Alarm implements Parcelable {
 /** GETTERS **/
     public String getAlarmName() { return name; }
     public long getAlarmTime() {return time;}
+    public String getRingtone() {return ringtone;}
     public boolean [] getWeek() {return week;}
     public boolean getWeekDay(int day) {return week[day];}
     public int getID() {return ID;}
@@ -133,11 +140,10 @@ public class Alarm implements Parcelable {
     public boolean readyToInsert() {
         if (contentValues == null)
             return false;
-        if (!contentValues.containsKey(AlarmEntry.COLUMN_NAME))
-            return false;
-        if (!contentValues.containsKey(AlarmEntry.COLUMN_TIME))
-            return false;
-        if (!contentValues.containsKey(AlarmEntry.COLUMN_ACTIVE))
+        if (!contentValues.containsKey(AlarmEntry.COLUMN_NAME) ||
+                !contentValues.containsKey(AlarmEntry.COLUMN_TIME) ||
+                !contentValues.containsKey(AlarmEntry.COLUMN_ACTIVE) ||
+                !contentValues.containsKey(AlarmEntry.COLUMN_RINGTONE) )
             return false;
         for (int i = 0; i < 7; i++) {
             if (!contentValues.containsKey(weekName[i]))
@@ -154,6 +160,7 @@ public class Alarm implements Parcelable {
     public void setAlarmName(String name) {this.name = name; putNameToCV();}
     public void setAlarmTime(long time) {this.time = time; putTimeToCV();}
     public void setWeekDay (int day, boolean isActiveDay) {this.week[day] = isActiveDay; putDayToCV(day, this.week[day] ? 1 : 0);}
+    public void setRingtone(String ringtone) { this.ringtone = ringtone; putRingtoneToCV();}
     public void setID(String id) {
         this.ID = Integer.parseInt(id);
     }
@@ -180,6 +187,7 @@ public class Alarm implements Parcelable {
         putTimeToCV();
         putWeekToCV();
         putActiveToCV();
+        putRingtoneToCV();
     }
     private void putNameToCV() {
         contentValues.put(AlarmEntry.COLUMN_NAME, name);
@@ -190,6 +198,7 @@ public class Alarm implements Parcelable {
     private void putActiveToCV() {
         contentValues.put(AlarmEntry.COLUMN_ACTIVE, active);
     }
+    private void putRingtoneToCV() {contentValues.put(AlarmEntry.COLUMN_RINGTONE, ringtone);}
     private void putWeekToCV() {
         for (int i  = 0; i < 7; i++) {
             putDayToCV(i, week[i] ? 1 : 0);
@@ -215,6 +224,7 @@ public class Alarm implements Parcelable {
         dest.writeBooleanArray(week);
         dest.writeInt(active ? 1 : 0);
         dest.writeInt(ID);
+        dest.writeString(ringtone);
         contentValues.writeToParcel(dest, 0);
     }
     public static final Creator<Alarm> CREATOR = new Creator<Alarm>() {

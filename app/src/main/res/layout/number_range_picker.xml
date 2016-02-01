@@ -4,11 +4,11 @@
     android:layout_height="match_parent">
 
 
-    <ImageButton  android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:maxWidth="70dp"
+    <ImageButton  android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:padding="20dp"
         android:scaleType="fitCenter"
+        android:background="@null"
         android:id="@+id/time_up"
         android:src="@drawable/arrow_up"
         android:contentDescription="Increase Hour" />
@@ -30,16 +30,16 @@
         android:text="12"
         android:selectAllOnFocus="true"
         android:id="@+id/current_time"
-        android:textSize="60sp" />
+        android:textSize="@dimen/time_text_size" />
 
-    <ImageButton  android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="true"
-        android:maxWidth="70dp"
+    <ImageButton  android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:padding="20dp"
+        android:background="@null"
         android:layout_below="@+id/current_time"
         android:scaleType="fitCenter"
         android:id="@+id/time_down"
         android:src="@drawable/arrow_down"
-        android:contentDescription="Increase Hour" />
+        android:contentDescription="Decrease Hour" />
 
 </RelativeLayout>

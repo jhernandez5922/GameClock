@@ -1,14 +1,16 @@
 package jhernandez.gameclock.alarm.creation;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.support.v4.app.NavUtils;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +57,7 @@ public class EditAlarm extends AppCompatActivity {
             R.id.friday_button,
             R.id.saturday_button
     };
+    private final static int TONE_PICKER = 867;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,18 +116,20 @@ public class EditAlarm extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
-    public static class AlarmEditFragment extends Fragment implements TextView.OnClickListener{
+    public static class AlarmEditFragment extends Fragment implements View.OnClickListener{
 
         Alarm alarm;
         boolean [] week;
         EditText name;
         CustomTimePicker timePicker;
+        Context appContext;
+        TextView currentRingtone;
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             alarm = this.getArguments().getParcelable("alarm");
+            appContext = getActivity();
         }
 
         @Override
@@ -132,24 +138,28 @@ public class EditAlarm extends AppCompatActivity {
             View rootView = inflater.inflate(R.layout.fragment_edit_create_alarm, container, false);
             name = (EditText) rootView.findViewById(R.id.edit_name);
             timePicker = (CustomTimePicker) rootView.findViewById(R.id.time_picker);
-            TextView [] weekViews = new TextView[7];
-            for (int i = 0; i < 7; i++) {
-                weekViews[i] = (TextView) rootView.findViewById(WEEK_VIEWS[i]);
-                weekViews[i].setOnClickListener(this);
-            }
+            //TextView [] weekViews = new TextView[7];
+            TextView ringtoneTitle = (TextView) rootView.findViewById(R.id.ringtone_button);
+            currentRingtone = (TextView) rootView.findViewById(R.id.current_ringtone);
+            ringtoneTitle.setOnClickListener(this);
+            currentRingtone.setOnClickListener(this);
+//
+//            for (int i = 0; i < 7; i++) {
+//                weekViews[i] = (TextView) rootView.findViewById(WEEK_VIEWS[i]);
+//                weekViews[i].setOnClickListener(this);
+//            }
             if (alarm != null) {
                 //SET TIME
                 Calendar currentTime = Calendar.getInstance();
                 currentTime.setTimeInMillis(alarm.getAlarmTime());
                 timePicker.setHour(currentTime.get(Calendar.HOUR_OF_DAY));
-                timePicker.setAmPm(currentTime.get(Calendar.HOUR_OF_DAY) > 12);
                 timePicker.setMinute(currentTime.get(Calendar.MINUTE));
                 name.setText(alarm.getAlarmName());
                 week = alarm.getWeek();
-                for (int i = 0; i < week.length; i++) {
-                    weekViews[i].setTextColor(week[i] ? ContextCompat.getColor(rootView.getContext(), R.color.color_primary)
-                            : ContextCompat.getColor(rootView.getContext(), R.color.color_primary_dark));
-                }
+//                for (int i = 0; i < week.length; i++) {
+//                    weekViews[i].setTextColor(week[i] ? ContextCompat.getColor(rootView.getContext(), R.color.color_primary)
+//                            : ContextCompat.getColor(rootView.getContext(), R.color.color_primary_dark));
+//                }
             }
             else {
                 alarm = new Alarm();
@@ -178,15 +188,34 @@ public class EditAlarm extends AppCompatActivity {
 
         @Override
         public void onClick(View v) {
-            TextView tv = (TextView) v;
-            int index = getDay(tv.getText().toString());
-            if (index == -1) {
-                Log.e(FRAG_TAG, "INVALID DAY");
-                return;
+            switch (v.getId()) {
+                case R.id.ringtone_button:
+                case R.id.current_ringtone:
+                    final Uri currentTone = RingtoneManager.getActualDefaultRingtoneUri(appContext, RingtoneManager.TYPE_ALARM);
+                    Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, currentTone);
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false);
+                    intent.putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true);
+                    startActivityForResult(intent, EditAlarm.TONE_PICKER);
+
             }
-            alarm.setWeekDay(index, !alarm.getWeekDay(index));
-            tv.setTextColor(alarm.getWeekDay(index) ? ContextCompat.getColor(v.getContext(), R.color.color_primary)
-                    : ContextCompat.getColor(v.getContext(), R.color.color_primary_dark));
+
+        }
+
+        @Override
+        public void onActivityResult(int requestCode, int resultCode, Intent data) {
+            if (resultCode == RESULT_OK) {
+                if (requestCode == TONE_PICKER) {
+                    Toast.makeText(getActivity(), "CORRECT", Toast.LENGTH_SHORT).show();
+                    Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+                    Ringtone current = RingtoneManager.getRingtone(appContext, uri);
+                    String ringtoneName = current.getTitle(appContext);
+                    currentRingtone.setText(ringtoneName);
+                }
+            }
         }
     }
 
@@ -209,27 +238,6 @@ public class EditAlarm extends AppCompatActivity {
         if (selections.contains("Sa"))
             week[6] = true;
         return week;
-    }
-
-    private static int getDay(String value) {
-        switch(value) {
-            case "Su":
-                return 0;
-            case "Mo":
-                return 1;
-            case "Tu":
-                return 2;
-            case "We":
-                return 3;
-            case "Th":
-                return 4;
-            case "Fr":
-                return 5;
-            case "Sa":
-                return 6;
-            default:
-                return -1;
-        }
     }
 
     private static String dayOfWeek (int i) {
@@ -256,6 +264,7 @@ public class EditAlarm extends AppCompatActivity {
         boolean[] week = setWeek(value);
         return getStringFromWeek(week);
     }
+
 
 
     private static String getStringFromWeek(boolean [] week) {
