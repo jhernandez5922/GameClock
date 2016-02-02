@@ -7,27 +7,21 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
 
 import jhernandez.gameclock.R;
 import jhernandez.gameclock.alarm.Alarm;
@@ -49,10 +43,10 @@ public class EditAlarm extends AppCompatActivity implements View.OnClickListener
         setContentView(R.layout.preference_activity_toolbar);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        Button save = (Button) findViewById(R.id.save_alarm);
-        Button cancel = (Button) findViewById(R.id.cancel_alarm);
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ImageButton save = (ImageButton) findViewById(R.id.save_alarm);
         save.setOnClickListener(this);
-        cancel.setOnClickListener(this);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         Bundle bundle = new Bundle();
         Alarm alarm = getIntent().getParcelableExtra("alarm");
@@ -116,9 +110,6 @@ public class EditAlarm extends AppCompatActivity implements View.OnClickListener
                 //Let menu activity know results from intent are okay
                 setResult(RESULT_OK, intent);
                 break;
-            case R.id.cancel_alarm:
-                setResult(RESULT_CANCELED);
-                break;
         }
         finish();
     }
@@ -140,11 +131,11 @@ public class EditAlarm extends AppCompatActivity implements View.OnClickListener
     public static class AlarmEditFragment extends Fragment implements View.OnClickListener{
 
         Alarm alarm;
-        boolean [] week;
         EditText name;
         CustomTimePicker timePicker;
         Context appContext;
         TextView currentRingtone;
+        WeekPicker week;
 
         /**
          * This is the first function called to create the fragment, it grabs the alarm (if present) and
@@ -181,7 +172,7 @@ public class EditAlarm extends AppCompatActivity implements View.OnClickListener
             //Set both title and description onClickListeners
             ringtoneTitle.setOnClickListener(this);
             currentRingtone.setOnClickListener(this);
-            WeekPicker weekPicker = (WeekPicker) rootView.findViewById(R.id.week_picker);
+            week = (WeekPicker) rootView.findViewById(R.id.week_picker);
             //Set to Current Settings or Default, depending on Editing or Creating an alarm, respectively
             if (alarm != null) {
                 Calendar currentTime = Calendar.getInstance();
@@ -189,15 +180,14 @@ public class EditAlarm extends AppCompatActivity implements View.OnClickListener
                 timePicker.setHour(currentTime.get(Calendar.HOUR_OF_DAY));
                 timePicker.setMinute(currentTime.get(Calendar.MINUTE));
                 name.setText(alarm.getAlarmName());
-                week = alarm.getWeek();
-                weekPicker.setWeek(week);
+                week.setWeek(alarm.getWeek());
             }
             else {
                 alarm = new Alarm();
-                week = new boolean[7];
-                Arrays.fill(week, true);
-                alarm.setEntireWeek(week);
-                weekPicker.setWeek(week);
+                boolean [] weekTemp = new boolean[7];
+                Arrays.fill(weekTemp, true);
+                alarm.setEntireWeek(weekTemp);
+                week.setWeek(weekTemp);
             }
             return rootView;
         }
@@ -215,7 +205,7 @@ public class EditAlarm extends AppCompatActivity implements View.OnClickListener
             newTime.set(Calendar.SECOND, 0);
             alarm.setAlarmTime(newTime.getTimeInMillis());
             //Set Week
-            alarm.setEntireWeek(week);
+            alarm.setEntireWeek(week.getWeek());
             //Set Name
             if (name.getText().toString().equals("")) {
                 alarm.setAlarmName("Alarm");

@@ -102,7 +102,6 @@
                     android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"/>
             </TableRow>
-
             <TableRow
                 android:background="@color/white_background">
 
@@ -119,7 +118,6 @@
                         android:progressDrawable="@drawable/scrubber_progress"
                         android:thumb="@drawable/scrubber_control" />
             </TableRow>
-
             <TableRow
                 android:background="@color/white_background">
 
@@ -135,16 +133,10 @@
 
                 <CheckBox
                     android:text="Sheep Jump"
+                    android:buttonTint="@color/color_primary"
                     android:textColor="@color/color_primary"
                     android:textSize="@dimen/text"/>
-
-
             </TableRow>
-
                 </TableLayout>
-
-
-
     </ScrollView>
-
 </RelativeLayout>

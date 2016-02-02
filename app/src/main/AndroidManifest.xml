@@ -35,6 +35,7 @@
         <activity
             android:name=".alarm.creation.EditAlarm"
             android:label="@string/title_activity_edit_alarm"
+            android:theme="@style/AppTheme"
             android:parentActivityName=".alarm.AlarmListActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
