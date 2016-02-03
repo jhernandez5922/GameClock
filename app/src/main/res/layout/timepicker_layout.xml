@@ -61,7 +61,7 @@
             android:gravity="center"
             android:textColor="@color/black_overlay"
             android:layout_margin="15dp"
-            android:text="AM"
+            android:text="PM"
             android:id="@+id/am_pm"
             android:textSize="@dimen/time_text_size"
             android:layout_gravity="center" />

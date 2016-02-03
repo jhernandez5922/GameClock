@@ -1,6 +1,7 @@
 package jhernandez.gameclock.alarm.creation;
 
 import android.content.Context;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -24,7 +25,32 @@ public class NumberRangePicker extends LinearLayout implements View.OnClickListe
     EditText numberDisplay;
     View rootView;
     ImageButton upButton, downButton;
-    private boolean incrementing;
+    private Handler repeatUpdateHandler = new Handler();
+    private boolean mAutoIncrement = false;
+    private boolean mAutoDecrement = false;
+    private static int REP_DELAY = 75;
+
+    class RptUpdater implements Runnable {
+
+        public void run() {
+            if( mAutoIncrement ){
+                increment();
+                repeatUpdateHandler.postDelayed( new RptUpdater(), REP_DELAY );
+            } else if( mAutoDecrement ){
+                decrement();
+                repeatUpdateHandler.postDelayed( new RptUpdater(), REP_DELAY );
+            }
+        }
+    }
+
+    private void increment() {
+        current = current >= max ? min : current + 1;
+        numberDisplay.setText(String.format("%02d", current));
+    }
+    private void decrement() {
+        current = current <= min ? max : current - 1;
+        numberDisplay.setText(String.format("%02d", current));
+    }
 
     public NumberRangePicker(Context context) {
         super(context);
@@ -51,10 +77,25 @@ public class NumberRangePicker extends LinearLayout implements View.OnClickListe
         upButton = (ImageButton) rootView.findViewById(R.id.time_up);
         downButton = (ImageButton) rootView.findViewById(R.id.time_down);
         setMode(1, 12, 12);
-//        upButton.setOnClickListener(this);
+        upButton.setOnLongClickListener(new View.OnLongClickListener(){
+            public boolean onLongClick(View arg0) {
+                mAutoIncrement = true;
+                repeatUpdateHandler.post( new RptUpdater() );
+                return false;
+            }
+        });
         upButton.setOnTouchListener(this);
-//        downButton.setOnClickListener(this);
+        upButton.setOnClickListener(this);
+        downButton.setOnLongClickListener(new OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mAutoDecrement = true;
+                repeatUpdateHandler.post(new RptUpdater());
+                return false;
+            }
+        });
         downButton.setOnTouchListener(this);
+        downButton.setOnClickListener(this);
         numberDisplay.addTextChangedListener(this);
     }
 
@@ -163,24 +204,13 @@ public class NumberRangePicker extends LinearLayout implements View.OnClickListe
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         int a = event.getAction();
-
-        if (v.getId() == R.id.time_up) {
-            if (a == MotionEvent.ACTION_DOWN) {
-                //startIncrementing(1);
-            }
-            else if (a == MotionEvent.ACTION_UP) {
-                //stopIncrementing();
-            }
+        if ((a == MotionEvent.ACTION_UP || a == MotionEvent.ACTION_CANCEL)) {
+            if (v.getId() == R.id.time_up && mAutoIncrement)
+                mAutoIncrement = false;
+            else if (v.getId() == R.id.time_down && mAutoDecrement)
+                mAutoDecrement = false;
         }
-        else if (v.getId() == R.id.time_down) {
-            if (a == MotionEvent.ACTION_DOWN) {
-                //startIncrementing(-1);
-            }
-            else if (a == MotionEvent.ACTION_UP) {
-                //stopIncrementing();
-            }
-        }
-        return true;
+        return false;
     }
 
 }

@@ -3,7 +3,6 @@ package jhernandez.gameclock.alarm;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -197,6 +196,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
 
         final WeekPicker week = (WeekPicker) v.findViewById(R.id.week_picker);
         final Alarm current = new Alarm(cursor);
+        week.setWeek(current.getWeek());
         week.setWeekOnClickListener(new TextView.OnClickListener() {
                 @Override
                 public void onClick(View v) {
