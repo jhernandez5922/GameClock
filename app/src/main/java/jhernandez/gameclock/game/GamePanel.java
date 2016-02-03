@@ -74,7 +74,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
                 currentPlayer.setPlaying(true);
             }
             else {
-                currentPlayer.setUP(true);
+                currentPlayer.jump();
             }
             return true;
         }

@@ -12,11 +12,11 @@ import jhernandez.gameclock.game.GamePanel;
 public class Player extends GameObject {
     private Bitmap spritesheet;
     private int score;
-    private boolean up;
+    private int direction;
     private boolean playing;
     private GameAnimator animation = new GameAnimator();
     private long startTime;
-
+    private boolean jump;
     public Player (Bitmap res, int w, int h, int numFrames) {
         x = 100;
         y = GamePanel.HEIGHT/2;
@@ -35,10 +35,7 @@ public class Player extends GameObject {
         animation.setDelay(10);
         startTime = System.nanoTime();
     }
-
-
-    public void setUP(boolean up) {this.up = up;}
-
+    public void setUP(boolean up) {}//this.down = up;}
     public void update() {
         long elasped = (System.nanoTime() - startTime)/100000;
         if (elasped > 100) {
@@ -46,18 +43,22 @@ public class Player extends GameObject {
             startTime = System.nanoTime();
         }
         animation.update();
-
-        dy = up ? dy-1 : dy+1;
-
-        if (dy > 14)
-            dy = 14;
-        else if (dy < -5)
-            dy = -5;
-
-        y += dy * 2;
-        dy = 0;
+        if (jump) {
+            direction++;
+            if (direction == 80) {
+                jump = false;
+                direction = 0;
+            }
+            y = direction <= 40 ? y+2 : y-2;
+            if (dy > 14)
+                dy = 14;
+            else if (dy < -5)
+                dy = -5;
+        }
     }
-
+    public void jump() {
+        this.jump = true;
+    }
     public void draw(Canvas canvas) {
         canvas.drawBitmap(animation.getImage(), x, y, null);
     }
