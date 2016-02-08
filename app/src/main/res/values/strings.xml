@@ -52,4 +52,5 @@
     <string name="title_section3">Section 3</string>
 
     <string name="title_activity_game_bridge">game_bridge</string>
+    <string name="title_activity_edit_alarm">Edit Create Alarm</string>
 </resources>

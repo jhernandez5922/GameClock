@@ -16,7 +16,7 @@ public class Player extends GameObject {
     private boolean playing;
     private GameAnimator animation = new GameAnimator();
     private long startTime;
-    private boolean jump;
+    private int jump;
     public Player (Bitmap res, int w, int h, int numFrames) {
         x = 100;
         y = GamePanel.HEIGHT/2;
@@ -26,11 +26,9 @@ public class Player extends GameObject {
 
         Bitmap[] image = new Bitmap[numFrames];
         spritesheet = res;
-
         for (int i = 0; i < image.length; i++) {
             image[i] = Bitmap.createBitmap(spritesheet, i*width, 0, width, height);
         }
-
         animation.setFrames(image);
         animation.setDelay(10);
         startTime = System.nanoTime();
@@ -43,21 +41,19 @@ public class Player extends GameObject {
             startTime = System.nanoTime();
         }
         animation.update();
-        if (jump) {
+        if (jump > 0) {
             direction++;
-            if (direction == 80) {
-                jump = false;
+            if (direction == 40) {
+                jump = 0;
                 direction = 0;
             }
-            y = direction <= 40 ? y+2 : y-2;
-            if (dy > 14)
-                dy = 14;
-            else if (dy < -5)
-                dy = -5;
+            y = direction <= 20 ? y+2 : y-2;
         }
     }
     public void jump() {
-        this.jump = true;
+        if (jump < 2) {
+            this.jump++;
+        }
     }
     public void draw(Canvas canvas) {
         canvas.drawBitmap(animation.getImage(), x, y, null);

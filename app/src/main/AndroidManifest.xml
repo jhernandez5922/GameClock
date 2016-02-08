@@ -35,8 +35,8 @@
         <activity
             android:name=".alarm.creation.EditAlarm"
             android:label="@string/title_activity_edit_alarm"
-            android:theme="@style/AppTheme"
-            android:parentActivityName=".alarm.AlarmListActivity" >
+            android:parentActivityName=".alarm.AlarmListActivity"
+            android:theme="@style/AppTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".alarm.AlarmListActivity" />
@@ -46,6 +46,10 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_game_bridge"
             android:theme="@style/FullscreenTheme" >
+        </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" >
         </activity>
     </application>
 
