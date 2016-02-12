@@ -2,10 +2,16 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorAccent">@color/color_accent</item>
-        <item name="colorPrimary">@color/color_primary</item>
-        <item name="colorPrimaryDark">@color/color_primary_dark</item>
-        <item name="android:textColorPrimary">@color/color_primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:textColorPrimary">@color/primary_dark</item>
+    </style>
+
+    <style name="ToolBarStyle" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="actionMenuTextColor">@android:color/white</item>
     </style>
 
     <style name="SettingsTheme" parent="Base.Theme.AppCompat.Light.DarkActionBar" >
@@ -49,13 +55,13 @@
     <style name="ButtonBarButton" />
 
     <style name="RadialTimePicker">
-        <item name="bpMainColor1">@color/color_primary</item>
-        <item name="bpMainColor2">@color/color_accent</item>
-        <item name="bpAccentColor">@color/color_primary_dark</item>
-        <item name="bpMainTextColor">@color/color_accent</item>
-        <item name="bpDoneTextColor">@color/color_primary_dark</item>
-        <item name="bpLineColor">@color/color_accent</item>
-        <item name="bpDoneBackgroundColor">@color/color_primary_dark</item>
+        <item name="bpMainColor1">@color/primary</item>
+        <item name="bpMainColor2">@color/accent</item>
+        <item name="bpAccentColor">@color/primary_dark</item>
+        <item name="bpMainTextColor">@color/accent</item>
+        <item name="bpDoneTextColor">@color/primary_dark</item>
+        <item name="bpLineColor">@color/accent</item>
+        <item name="bpDoneBackgroundColor">@color/primary_dark</item>
         <item name="bpSelectionAlpha">102</item>
     </style>
 

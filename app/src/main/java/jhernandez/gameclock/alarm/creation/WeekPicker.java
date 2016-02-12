@@ -102,8 +102,8 @@ public class WeekPicker extends LinearLayout implements View.OnClickListener {
                 R.drawable.week_gradient :
                 R.drawable.week_gradient_inverse);
         day.setTextColor(on ?
-                ContextCompat.getColor(day.getContext(), R.color.black_overlay) :
-                ContextCompat.getColor(day.getContext(), R.color.color_accent));
+                ContextCompat.getColor(day.getContext(), R.color.black) :
+                ContextCompat.getColor(day.getContext(), R.color.accent));
     }
     public static int getDay(String value) {
         switch(value) {

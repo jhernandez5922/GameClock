@@ -25,7 +25,7 @@
                     android:layout_height="match_parent"
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"
-                    android:background="@color/color_primary_dark"
+                    android:background="@color/primary_dark"
                     android:src="@drawable/trash_recyclebin_empty_closed"
                     />
 
@@ -41,7 +41,7 @@
                 android:id="@+id/magnifier2"
                 android:src="@android:drawable/ic_menu_save"
                 android:layout_width="70dp"
-                android:background="@color/color_primary_dark"
+                android:background="@color/primary_dark"
                 android:layout_height="match_parent" />
 
         </LinearLayout>
@@ -50,7 +50,7 @@
             android:id="@+id/cardBackground"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/color_accent">
+            android:background="@color/accent">
 
             <TextView
                 android:id="@+id/card_title"
@@ -59,14 +59,14 @@
                 android:layout_toRightOf="@+id/digital_clock"
                 android:text="Title"
                 android:gravity="center_vertical"
-                android:textColor="@color/color_primary"
+                android:textColor="@color/primary"
                 android:textSize="24sp"
                 android:layout_above="@+id/week_picker"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentEnd="true" />
             <CheckBox
                 android:id="@+id/active"
-                android:buttonTint="@color/color_primary"
+                android:buttonTint="@color/primary"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@+id/digital_clock"
@@ -77,7 +77,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:textColor="@color/color_primary"
+                android:textColor="@color/primary"
                 android:text="12:00 AM"
                 android:textSize="48sp"
                 android:layout_alignParentTop="true"

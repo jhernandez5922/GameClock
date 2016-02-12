@@ -2,25 +2,25 @@
 
 
 
-    <color name="color_accent">#26292b</color>
+    <color name="accent">#26292b</color>
 
-    <color name="color_primary">#e87f39</color>
+    <color name="primary">#e87f39</color>
 
-    <color name="color_primary_light">#ffb769</color>
+    <color name="primary_light">#ffb769</color>
 
-    <color name="color_primary_light_2">#cc9254</color>
+    <color name="primary_light_2">#cc9254</color>
 
-    <color name="color_primary_dark">#7e4b21</color>
+    <color name="primary_dark">#7e4b21</color>
 
 
 
     <color name="yellow">#FFBB33</color>
 
-    <color name="white_background">#e0e0e0</color>
+    <color name="white">#e0e0e0</color>
 
-    <color name="black_overlay">#292929</color>
+    <color name="black">#292929</color>
 
-    <color name="green_edit">#63c64e</color>
+    <color name="green_custom">#63c64e</color>
 
-    <color name="red_delete">#c53d2e</color>
+    <color name="red_custom">#c53d2e</color>
 </resources>

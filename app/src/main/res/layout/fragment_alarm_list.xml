@@ -7,20 +7,34 @@
     android:fitsSystemWindows="true"
     android:background="#ffffff">
 
-
+    <android.support.design.widget.AppBarLayout android:id="@+id/appbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:elevation="4dp"
+        android:background="@drawable/grassbg1">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/color_primary"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="@style/ToolBarStyle"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
 
+        </android.support.v7.widget.Toolbar>
+
+        <AnalogClock
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:minHeight="50dp"
+            android:gravity="center"
+            android:layout_gravity="center"/>
+
+    </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView
-        android:layout_below="@+id/my_toolbar"
+        android:layout_below="@+id/appbar"
         android:id="@+id/my_recycler_view"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
@@ -53,5 +67,5 @@
         android:gravity="center_horizontal"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
         android:text="Empty View!"
-        android:layout_below="@+id/my_toolbar" />
+        android:layout_below="@+id/appbar" />
 </RelativeLayout>
