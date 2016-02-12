@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
+    android:layout_height="100dp"
     android:layout_marginBottom="5dp" >
 
     <com.daimajia.swipe.SwipeLayout xmlns:swipe="http://schemas.android.com/apk/res-auto"
@@ -54,31 +54,35 @@
 
             <TextView
                 android:id="@+id/card_title"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/digital_clock"
                 android:text="Title"
                 android:gravity="center_vertical"
                 android:textColor="@color/color_primary"
-                android:textSize="24sp"/>
+                android:textSize="24sp"
+                android:layout_above="@+id/week_picker"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
             <CheckBox
                 android:id="@+id/active"
-                android:layout_marginTop="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
                 android:buttonTint="@color/color_primary"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/digital_clock"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
             <TextView
                 android:id="@+id/digital_clock"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:textColor="@color/color_primary"
                 android:text="12:00 AM"
                 android:textSize="48sp"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true" />
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
             <jhernandez.gameclock.alarm.creation.WeekPicker
                 android:id="@+id/week_picker"
                 android:layout_width="fill_parent"
