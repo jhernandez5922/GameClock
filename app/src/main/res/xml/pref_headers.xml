@@ -3,7 +3,15 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header android:fragment="jhernandez.gameclock.SettingsActivity$GeneralPreferenceFragment"
+<<<<<<< Updated upstream
         android:title="@string/pref_header_general" />
+=======
+<<<<<<< HEAD
+        android:title="@string/pref_header_alarm" />
+=======
+        android:title="@string/pref_header_general" />
+>>>>>>> ccb2f5f9d140a9ac88e28c6e0cef58417de5197f
+>>>>>>> Stashed changes
 
     <header android:fragment="jhernandez.gameclock.SettingsActivity$NotificationPreferenceFragment"
         android:title="@string/pref_header_notifications" />

@@ -31,12 +31,12 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends PreferenceActivity {
+    public static final String TIME_FORMAT = "time_format";
 
     @Override
     protected boolean isValidFragment(String fragmentName) {
         return true;
     }
-
     /**
      * {@inheritDoc}
      */
