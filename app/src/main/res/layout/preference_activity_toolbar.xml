@@ -20,7 +20,6 @@
                 android:text="Create an Alarm"
                 android:textSize="@dimen/title_text_size"
                 android:gravity="center"
-                android:textColor="@color/primary_dark"
                 android:layout_weight="1"/>
             <ImageButton
                 android:id="@+id/save_alarm"

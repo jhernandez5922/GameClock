@@ -2,12 +2,14 @@ package jhernandez.gameclock;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -31,7 +33,6 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends PreferenceActivity {
-    public static final String TIME_FORMAT = "time_format";
 
     @Override
     protected boolean isValidFragment(String fragmentName) {
@@ -106,6 +107,16 @@ public class SettingsActivity extends PreferenceActivity {
                         preference.setSummary(name);
                     }
                 }
+            } else if (preference instanceof CheckBoxPreference) {
+                Context context = preference.getContext();
+                if (preference.getKey().equals(context.getResources().getString(R.string.time_format_key))){
+                    boolean isChecked = !((CheckBoxPreference) preference).isChecked();
+                    if (stringValue.equals(""))
+                        isChecked = !isChecked;
+                    preference.setSummary( isChecked ?
+                            "12 Hour Format" :
+                            "24 Hour Format");
+                }
 
             } else {
                 // For all other preferences, set the summary to the value's
@@ -126,15 +137,25 @@ public class SettingsActivity extends PreferenceActivity {
      * @see #sBindPreferenceSummaryToValueListener
      */
     private static void bindPreferenceSummaryToValue(Preference preference) {
+        Object value;
+        Context context = preference.getContext();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        try {
+            value = sharedPreferences.getString(preference.getKey(), "");
+        } catch (ClassCastException e) {
+            value = "";
+        }
+        bindPreferenceSummaryToValue(preference, value);
+    }
+
+    private static void bindPreferenceSummaryToValue(Preference preference, Object value) {
         // Set the listener to watch for value changes.
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
         // Trigger the listener immediately with the preference's
         // current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                PreferenceManager
-                        .getDefaultSharedPreferences(preference.getContext())
-                        .getString(preference.getKey(), ""));
+        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, value);
     }
 
     /**
@@ -152,8 +173,9 @@ public class SettingsActivity extends PreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.time_format_key)));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.clock_type_key)));
+            bindPreferenceSummaryToValue(findPreference(getResources().getString(R.string.alarm_name_key)));
         }
 
     }

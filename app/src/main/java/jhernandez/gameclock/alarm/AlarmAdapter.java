@@ -3,29 +3,31 @@ package jhernandez.gameclock.alarm;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.daimajia.swipe.SimpleSwipeListener;
 import com.daimajia.swipe.SwipeLayout;
 
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import jhernandez.gameclock.R;
 import jhernandez.gameclock.alarm.creation.EditAlarm;
-import jhernandez.gameclock.alarm.creation.WeekPicker;
 import jhernandez.gameclock.sqlite.AlarmContract;
 
 /**
+ * This class contains the adapter needed to read the information from the SQLite database created
+ * and present it with a RecyclerView
  * Created by Jason on 11/3/2015.
  */
 public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> {
@@ -43,24 +45,20 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         protected SwipeLayout swipeLayout;
         protected View editButton;
         protected ImageView deleteButton;
-        protected CheckBox active;
+        protected Switch active;
+        protected TextView timeView;
         Alarm alarm;
 
         public ViewHolder(View v) {
             super(v);
             titleText = (TextView) v.findViewById(R.id.card_title);
             card = (CardView) v;
-            active = (CheckBox) v.findViewById(R.id.active);
+            active = (Switch) v.findViewById(R.id.active);
             swipeLayout = (SwipeLayout) v.findViewById(R.id.swipe);
             deleteButton = (ImageView) v.findViewById(R.id.delete);
             editButton = v.findViewById(R.id.bottom_wrapper_2);
+            timeView = (TextView) v.findViewById(R.id.digital_clock);
             active.setChecked(true);
-            v.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(v.getContext(), "onItemSelected: " + titleText.getText().toString(), Toast.LENGTH_SHORT).show();
-                }
-            });
         }
 
         public void updateActive() {
@@ -74,11 +72,15 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             alarm.setActive(isChecked);
+            int color = ContextCompat.getColor(buttonView.getContext(), isChecked ?
+                    R.color.text_primary :
+                    R.color.text_secondary);
+            titleText.setTextColor(color);
+            timeView.setTextColor(color);
             if (isChecked)
                 AlarmReceiver.setAlarm(buttonView.getContext().getApplicationContext(), alarm);
             else
                 AlarmReceiver.deactivateAlarm(buttonView.getContext().getApplicationContext(), alarm);
-
         }
 
     }
@@ -93,7 +95,10 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                     null,
                     null
             );
-            cursor.moveToFirst();
+            if (cursor != null)
+                cursor.moveToFirst();
+            else
+                return;
         }
         mCursorAdapter = new CursorAdapter(mContext, cursor, 0) {
             @Override
@@ -107,7 +112,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
                 ((TextView) view.findViewById(R.id.card_title)).setText(
                         cursor.getString(cursor.getColumnIndex(AlarmContract.AlarmEntry.COLUMN_NAME)));
                 long id = cursor.getLong(cursor.getColumnIndex(AlarmContract.AlarmEntry.COLUMN_TIME));
-                SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
+                SimpleDateFormat sdf = new SimpleDateFormat("h:mm a", Locale.US);
                 ((TextView) view.findViewById(R.id.digital_clock)).setText(sdf.format(id));
                 setUpWeek(view, cursor);
 
@@ -125,25 +130,20 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         Cursor c = mCursorAdapter.getCursor();
-        c.moveToPosition(holder.getAdapterPosition());
+        final int holderPosition = holder.getAdapterPosition();
+        c.moveToPosition(holderPosition);
         holder.swipeLayout.setShowMode(SwipeLayout.ShowMode.LayDown);
         holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Left, holder.editButton);
-        holder.swipeLayout.addSwipeListener(new SimpleSwipeListener() {
-            @Override
-            public void onOpen(SwipeLayout layout) {
-                //YoYo.with(Techniques.Tada).duration(500).delay(100).playOn(layout.findViewById(R.id.trash));
-            }
-        });
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                removeItem(position);
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, mCursorAdapter.getCount());
+                removeItem(holderPosition);
+                notifyItemRemoved(holderPosition);
+                notifyItemRangeChanged(holderPosition, mCursorAdapter.getCount());
                 AlarmReceiver.deactivateAlarm(mContext, holder.alarm);
                 Toast.makeText(view.getContext(), "Deleted " + holder.titleText.getText().toString() + "!", Toast.LENGTH_SHORT).show();
             }
@@ -152,7 +152,7 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
             @Override
             public void onClick(View v) {
                 Cursor c = mCursorAdapter.getCursor();
-                c.moveToPosition(position);
+                c.moveToPosition(holderPosition);
                 AlarmReceiver.deactivateAlarm(mContext.getApplicationContext(), holder.alarm);
                 Intent intent = new Intent(mContext, EditAlarm.class);
                 intent.putExtra("alarm", holder.alarm);
@@ -194,17 +194,17 @@ public class AlarmAdapter extends RecyclerView.Adapter<AlarmAdapter.ViewHolder> 
 
     private void setUpWeek(View v, Cursor cursor) {
 
-        final WeekPicker week = (WeekPicker) v.findViewById(R.id.week_picker);
-        final Alarm current = new Alarm(cursor);
-        week.setWeek(current.getWeek());
-        week.setWeekOnClickListener(new TextView.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    week.onClick(v);
-                    current.setEntireWeek(week.getWeek());
-                    AlarmReceiver.setAlarm(mContext.getApplicationContext(), current);
-                    mContext.getContentResolver().update(AlarmContract.AlarmEntry.CONTENT_URI, current.contentValues,"_id=" + current.getID(), null );
-                }
-            });
+//        final WeekPicker week = (WeekPicker) v.findViewById(R.id.week_picker);
+//        final Alarm current = new Alarm(cursor);
+//        week.setWeek(current.getWeek());
+//        week.setWeekOnClickListener(new TextView.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    week.onClick(v);
+//                    current.setEntireWeek(week.getWeek());
+//                    AlarmReceiver.setAlarm(mContext.getApplicationContext(), current);
+//                    mContext.getContentResolver().update(AlarmContract.AlarmEntry.CONTENT_URI, current.contentValues,"_id=" + current.getID(), null );
+//                }
+//            });
         }
 }

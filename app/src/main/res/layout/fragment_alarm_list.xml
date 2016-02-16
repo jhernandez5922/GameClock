@@ -1,20 +1,21 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="jhernandez.gameclock.alarm.AlarmListFragment"
-    android:fitsSystemWindows="true"
-    android:background="#ffffff">
+    android:fitsSystemWindows="true">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent">
 
     <android.support.design.widget.AppBarLayout android:id="@+id/appbar"
         android:layout_width="match_parent" android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
-        android:elevation="4dp"
-        android:background="@drawable/grassbg1">
+        android:background="@color/primary">
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/my_toolbar"
+    <android.support.v7.widget.Toolbar android:id="@+id/my_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="?attr/actionBarSize"
@@ -26,46 +27,40 @@
         <AnalogClock
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@android:color/white"
             android:minHeight="50dp"
             android:gravity="center"
             android:layout_gravity="center"/>
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <android.support.v7.widget.RecyclerView android:id="@+id/my_recycler_view"
         android:layout_below="@+id/appbar"
-        android:id="@+id/my_recycler_view"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"/>
 
-    <LinearLayout
-        android:id="@+id/ly_bar_bottom"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:gravity="right"
-        android:orientation="horizontal">
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:src="@drawable/mini_clock"
-            android:layout_margin="25dp"
-            app:borderWidth="0dp"
-            app:elevation="6dp"
-            app:pressedTranslationZ="12dp" />
-    </LinearLayout>
-
-    <TextView
+    <TextView android:id="@+id/empty_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:id="@+id/empty_view"
+        android:layout_below="@+id/appbar"
         android:gravity="center_horizontal"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Headline"
         android:text="Empty View!"
-        android:layout_below="@+id/appbar" />
-</RelativeLayout>
+        android:layout_alignBottom="@+id/my_recycler_view" />
+
+    </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@+id/appbar"
+        app:layout_anchorGravity="bottom|right|end"
+        app:borderWidth="0dp"
+        app:elevation="6dp"
+        android:src="@drawable/ic_plus"
+        app:pressedTranslationZ="12dp"
+        android:layout_marginRight="16dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+</android.support.design.widget.CoordinatorLayout>

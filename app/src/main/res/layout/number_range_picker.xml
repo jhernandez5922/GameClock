@@ -23,7 +23,6 @@
         android:layout_alignEnd="@+id/time_down"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textCursorDrawable="@null"
-        android:textColor="@color/primary"
         android:maxLength="2"
         android:gravity="center"
         android:inputType="time"

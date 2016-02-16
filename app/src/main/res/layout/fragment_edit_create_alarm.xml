@@ -2,10 +2,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context="jhernandez.gameclock.alarm.creation.EditAlarm.AlarmEditFragment">
+    tools:context="jhernandez.gameclock.alarm.creation.EditAlarm">
+
+    <ListView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+
+
+    </ListView>
     <ScrollView
-        android:background="@color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -14,62 +20,57 @@
             android:layout_height="wrap_content">
 
             <TableRow
-                android:background="@color/black"
+                android:background="@color/primary"
                 android:minHeight="180dp">
 
                 <jhernandez.gameclock.alarm.creation.CustomTimePicker
                     android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:paddingTop="30dp"
-                    android:paddingBottom="30dp"
+                    android:paddingTop="15dp"
+                    android:paddingBottom="15dp"
                     android:layout_weight="1"
                     android:id="@+id/time_picker"
                      />
             </TableRow>
 
             <TableRow
-                android:background="@color/white"
                 android:layout_marginTop="1dp"
                 android:layout_width="wrap_content">
                 <TextView android:id="@+id/repeating"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:textSize="@dimen/title_text_size"
-                    android:textColor="@color/black"
                     android:text="Repeating"/>
 
             </TableRow>
-            <TableRow
-                android:background="@color/white" >
+            <TableRow>
                     <jhernandez.gameclock.alarm.creation.WeekPicker layout="@layout/week_picker"
                         android:id="@+id/week_picker"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1" />
             </TableRow>
-            <TableRow android:background="@color/white"
+            <TableRow
                 android:layout_marginTop="1dp">
                 <TextView android:id="@+id/name"
                     android:layout_width="fill_parent"
                     android:layout_marginTop="5dp"
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/title_text_size"
                     android:text="Name"/>
             </TableRow>
-            <TableRow android:background="@color/white"
+            <TableRow
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content">
                 <EditText android:id="@+id/edit_name"
                     android:layout_height="wrap_content"
-                    android:textColorHint="@color/primary_dark"
-                    android:backgroundTint="@color/black"
-                    android:textColor="@color/primary"
                     android:layout_width="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:singleLine="true"
@@ -77,34 +78,28 @@
             </TableRow>
 
             <TableRow
-                android:background="@color/white"
                 android:layout_marginTop="1dp">
 
                 <TextView android:id="@+id/ringtone_button"
                     android:layout_height="wrap_content"
                     android:text="Ringtone"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
-                    android:textColor="@color/black"
                     android:textSize="@dimen/title_text_size"
                     android:layout_width="wrap_content"/>
             </TableRow>
-            <TableRow
-                android:background="@color/white">
-
+            <TableRow>
                 <TextView android:id="@+id/current_ringtone"
                     android:layout_height="wrap_content"
                     android:text="Default Ringtone"
                     android:gravity="left"
-                    android:textColor="@color/primary"
                     android:textSize="@dimen/text"
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:layout_width="wrap_content"/>
             </TableRow>
-            <TableRow
-                android:background="@color/white">
-
+            <TableRow>
                     <ImageView
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
@@ -118,23 +113,19 @@
                         android:progressDrawable="@drawable/scrubber_progress"
                         android:thumb="@drawable/scrubber_control" />
             </TableRow>
-            <TableRow
-                android:background="@color/white">
-
+            <TableRow>
                  <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="10dp"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     android:textSize="@dimen/title_text_size"
                     android:text="Games"/>
             </TableRow>
-            <TableRow
-                android:background="@color/white">
-
+            <TableRow>
                 <CheckBox
                     android:text="Sheep Jump"
-                    android:buttonTint="@color/primary"
-                    android:textColor="@color/primary"
                     android:textSize="@dimen/text"/>
             </TableRow>
                 </TableLayout>
